@@ -48,7 +48,10 @@ services:
       - rabbitmq
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_AUTH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
     networks:
       - appnet
 
@@ -60,7 +63,7 @@ services:
       - rabbitmq
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_DATING_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     networks:
       - appnet
 volumes:
