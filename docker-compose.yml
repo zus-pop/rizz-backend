@@ -1,0 +1,71 @@
+services:
+  postgres:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: dating_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - appnet
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: dating_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "5672:5672"     # RabbitMQ broker
+      - "15672:15672"   # Management UI
+    networks:
+      - appnet
+      
+  gateway:
+    build: ./gateway/Gateway.API
+    container_name: dating_gateway
+    ports:
+      - "5000:80"
+    depends_on:
+      - auth
+      - users
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    networks:
+      - appnet
+
+  auth:
+    build: ./services/AuthService/AuthService.API
+    container_name: dating_auth
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    networks:
+      - appnet
+
+  users:
+    build: ./services/UserService/UserService.API
+    container_name: dating_users
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    networks:
+      - appnet
+volumes:
+  postgres_data:
+
+networks:
+  appnet:
+    driver: bridge
