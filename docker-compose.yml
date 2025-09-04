@@ -66,6 +66,21 @@ services:
       - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_DATING_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     networks:
       - appnet
+
+  match:
+    build: ./services/MatchService/MatchService.API
+    container_name: dating_match
+    depends_on:
+      - postgres
+      - rabbitmq
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_MATCH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - RabbitMQ__Host=${RABBITMQ_HOST}
+      - RabbitMQ__User=${RABBITMQ_DEFAULT_USER}
+      - RabbitMQ__Pass=${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - appnet
 volumes:
   postgres_data:
 
