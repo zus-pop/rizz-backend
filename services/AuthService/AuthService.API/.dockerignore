@@ -1,0 +1,10 @@
+bin/
+obj/
+*.user
+*.vspscc
+*.vssscc
+.vs/
+Dockerfile
+.dockerignore
+.env
+.env.*
