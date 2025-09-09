@@ -52,22 +52,34 @@ namespace AiInsightsService.API.Services
                     var db = scope.ServiceProvider.GetRequiredService<AiDbContext>();
 
                     // TODO: Replace with real AI analysis
-                    var insight = await db.AiInsights.FindAsync(evt.UserId)
-                                  ?? new AiInsight { UserId = evt.UserId };
-
-                    insight.SummaryText = $"Auto-generated summary for user {evt.UserId}";
-                    insight.PersonalityTags = JsonSerializer.Serialize(new[] { "friendly", "curious" });
-                    insight.CompatibilityScore = new Random().Next(50, 100); // placeholder
-                    insight.UpdatedAt = DateTime.UtcNow;
-
-                    db.AiInsights.Update(insight);
+                    var insight = await db.AiInsights.FindAsync(evt.UserId);
+                    
+                    if (insight == null)
+                    {
+                        insight = new AiInsight 
+                        { 
+                            UserId = evt.UserId,
+                            SummaryText = $"Auto-generated summary for user {evt.UserId}",
+                            PersonalityTags = JsonSerializer.Serialize(new[] { "friendly", "curious" }),
+                            CompatibilityScore = new Random().Next(50, 100), // placeholder
+                            UpdatedAt = DateTime.UtcNow
+                        };
+                        db.AiInsights.Add(insight);
+                    }
+                    else
+                    {
+                        insight.SummaryText = $"Auto-generated summary for user {evt.UserId}";
+                        insight.PersonalityTags = JsonSerializer.Serialize(new[] { "friendly", "curious" });
+                        insight.CompatibilityScore = new Random().Next(50, 100); // placeholder
+                        insight.UpdatedAt = DateTime.UtcNow;
+                    }
                     await db.SaveChangesAsync();
                 }
 
-                _channel.BasicAck(ea.DeliveryTag, false);
+                _channel?.BasicAck(ea.DeliveryTag, false);
             };
 
-            _channel.BasicConsume(queue: "ai_insights_queue",
+            _channel?.BasicConsume(queue: "ai_insights_queue",
                                   autoAck: false,
                                   consumer: consumer);
 

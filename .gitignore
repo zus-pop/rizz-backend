@@ -41,6 +41,7 @@ bld/
 
 # Environment and secrets
 .env
+**/appsettings.json
 **/appsettings.Development.json
 **/appsettings.Local.json
 **/Properties/launchSettings.json
