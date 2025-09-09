@@ -6,7 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(
-        builder.Configuration.GetConnectionString("Postgres"),
+        builder.Configuration.GetConnectionString("DefaultConnection"),
         o => o.UseNetTopologySuite()
     ));
 
