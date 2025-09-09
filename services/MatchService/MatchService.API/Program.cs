@@ -5,7 +5,7 @@ using MatchService.API.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<MatchDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddSingleton<RabbitMqService>();
 
