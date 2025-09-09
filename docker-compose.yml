@@ -48,7 +48,7 @@ services:
       - rabbitmq
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_AUTH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_AUTH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - Jwt__Key=${JWT_KEY}
       - Jwt__Issuer=${JWT_ISSUER}
       - Jwt__Audience=${JWT_AUDIENCE}
@@ -63,7 +63,7 @@ services:
       - rabbitmq
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_DATING_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_DATING_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     networks:
       - appnet
 
@@ -75,7 +75,7 @@ services:
       - rabbitmq
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_MATCH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_MATCH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - RabbitMQ__Host=${RABBITMQ_HOST}
       - RabbitMQ__User=${RABBITMQ_DEFAULT_USER}
       - RabbitMQ__Pass=${RABBITMQ_DEFAULT_PASS}
@@ -89,7 +89,7 @@ services:
       - rabbitmq
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__Postgres=Host=postgres;Database=notification_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=notification_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - RabbitMQ__Host=${RABBITMQ_HOST}
       - RabbitMQ__User=${RABBITMQ_DEFAULT_USER}
       - RabbitMQ__Pass=${RABBITMQ_DEFAULT_PASS}
@@ -103,7 +103,7 @@ services:
       - rabbitmq
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__Postgres=Host=postgres;Database=messaging_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=messaging_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - RabbitMQ__Host=${RABBITMQ_HOST}
       - RabbitMQ__User=${RABBITMQ_DEFAULT_USER}
       - RabbitMQ__Pass=${RABBITMQ_DEFAULT_PASS}
@@ -118,7 +118,12 @@ services:
       - rabbitmq
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Postgres=Host=postgres;Database=${POSTGRES_AI_INSIGHTS_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_AI_INSIGHTS_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - RabbitMQ__Host=${RABBITMQ_HOST}
+      - RabbitMQ__User=${RABBITMQ_DEFAULT_USER}
+      - RabbitMQ__Pass=${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - appnet
   purchase-service:
     build: ./services/PurchaseService/PurchaseService.API
     ports:
@@ -128,6 +133,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_PURCHASE_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    networks:
+      - appnet
   moderation-service:
     build: ./services/ModerationService/ModerationService.API
     ports:
@@ -137,6 +144,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_MODERATION_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+    networks:
+      - appnet
 
 volumes:
   postgres_data:
