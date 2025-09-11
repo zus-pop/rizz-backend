@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using AuthService.API.Data;
+using Common.Infrastructure.HealthChecks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,7 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 
 // Add Authentication
 var jwtConfig = builder.Configuration.GetSection("Jwt");
-var key = Encoding.ASCII.GetBytes(jwtConfig["Key"]);
+var key = Encoding.ASCII.GetBytes(jwtConfig["Key"] ?? "default-key");
 
 builder.Services.AddAuthentication(opt =>
 {
@@ -47,6 +48,9 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Add custom health checks
+builder.Services.AddCustomHealthChecks("AuthService");
+
 var app = builder.Build();
 
 // Use CORS
@@ -55,6 +59,12 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map health checks
+app.MapHealthChecks("/health");
+
 app.MapControllers();
+
+// Configure to listen on all interfaces
+app.Urls.Add("http://0.0.0.0:8080");
 
 app.Run();

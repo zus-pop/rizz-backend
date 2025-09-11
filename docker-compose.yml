@@ -1,4 +1,5 @@
 services:
+  # Infrastructure Services
   postgres:
     image: postgis/postgis:15-3.3-alpine
     container_name: dating_postgres
@@ -13,6 +14,11 @@ services:
       - "5432:5432"
     networks:
       - appnet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -26,26 +32,42 @@ services:
       - "15672:15672"   # Management UI
     networks:
       - appnet
-      
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # API Gateway
   gateway:
     build: ./gateway/Gateway.API
     container_name: dating_gateway
     ports:
       - "5000:80"
     depends_on:
-      - auth
-      - users
+      auth:
+        condition: service_healthy
+      users:
+        condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
     networks:
       - appnet
+    restart: unless-stopped
 
+  # Core Services
   auth:
-    build: ./services/AuthService/AuthService.API
+    build:
+      context: .
+      dockerfile: ./services/AuthService/AuthService.API/Dockerfile
     container_name: dating_auth
+    ports:
+      - "5001:8080"
     depends_on:
-      - postgres
-      - rabbitmq
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_AUTH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
@@ -54,10 +76,20 @@ services:
       - Jwt__Audience=${JWT_AUDIENCE}
     networks:
       - appnet
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/auth/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   users:
-    build: ./services/UserService/UserService.API
+    build:
+      context: .
+      dockerfile: ./services/UserService/UserService.API/Dockerfile
     container_name: dating_users
+    ports:
+      - "5002:80"
     depends_on:
       - postgres
       - rabbitmq
@@ -68,8 +100,12 @@ services:
       - appnet
 
   match:
-    build: ./services/MatchService/MatchService.API
+    build:
+      context: .
+      dockerfile: ./services/MatchService/MatchService.API/Dockerfile
     container_name: dating_match
+    ports:
+      - "5003:8080"
     depends_on:
       - postgres
       - rabbitmq
@@ -82,8 +118,12 @@ services:
     networks:
       - appnet
   notify:
-    build: ./services/NotificationService/NotificationService.API
+    build:
+      context: .
+      dockerfile: ./services/NotificationService/NotificationService.API/Dockerfile
     container_name: dating_notification
+    ports:
+      - "5004:8080"
     depends_on:
       - postgres
       - rabbitmq
@@ -96,8 +136,12 @@ services:
     networks:
       - appnet
   messaging:
-    build: ./services/MessagingService/MessagingService.API
+    build:
+      context: .
+      dockerfile: ./services/MessagingService/MessagingService.API/Dockerfile
     container_name: dating_messaging
+    ports:
+      - "5005:8080"
     depends_on:
       - postgres
       - rabbitmq
@@ -110,9 +154,12 @@ services:
     networks:
       - appnet
   ai-insights-service:
-    build: ./services/AiInsightsService/AiInsightsService.API
+    build:
+      context: .
+      dockerfile: ./services/AiInsightsService/AiInsightsService.API/Dockerfile
+    container_name: dating_ai_insights
     ports:
-      - "5006:80"
+      - "5006:8080"
     depends_on:
       - postgres
       - rabbitmq
@@ -125,9 +172,12 @@ services:
     networks:
       - appnet
   purchase-service:
-    build: ./services/PurchaseService/PurchaseService.API
+    build:
+      context: .
+      dockerfile: ./services/PurchaseService/PurchaseService.API/Dockerfile
+    container_name: dating_purchase
     ports:
-      - "5007:80"
+      - "5007:8080"
     depends_on:
       - postgres
     environment:
@@ -136,9 +186,12 @@ services:
     networks:
       - appnet
   moderation-service:
-    build: ./services/ModerationService/ModerationService.API
+    build:
+      context: .
+      dockerfile: ./services/ModerationService/ModerationService.API/Dockerfile
+    container_name: dating_moderation
     ports:
-      - "5008:80"
+      - "5008:8080"
     depends_on:
       - postgres
     environment:
