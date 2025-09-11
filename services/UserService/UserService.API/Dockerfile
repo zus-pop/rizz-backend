@@ -1,7 +1,17 @@
 # build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY . .
+
+# Copy shared libraries first
+COPY shared/ shared/
+
+# Copy the specific service
+COPY services/UserService/UserService.API/ services/UserService/UserService.API/
+
+# Set working directory to the service
+WORKDIR /src/services/UserService/UserService.API
+
+# Restore and build
 RUN dotnet restore "UserService.API.csproj"
 RUN dotnet publish "UserService.API.csproj" -c Release -o /app/publish
 

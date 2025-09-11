@@ -412,3 +412,17 @@ FodyWeavers.xsd
 *.sln.iml
 
 # End of https://www.toptal.com/developers/gitignore/api/csharp
+
+# Testing and Documentation (Generated during development)
+docs/testing-results/
+scripts/testing/
+scripts/utilities/
+
+# Additional test files and documentation
+*.test.md
+*_TEST_*.md
+*_RESULTS_*.md
+*.test.ps1
+*test*.ps1
+*verify*.ps1
+*.test.py
