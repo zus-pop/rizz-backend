@@ -22,26 +22,51 @@ namespace AuthService.API.Controllers
             _config = config;
         }
 
+        [HttpGet("health")]
+        public IActionResult Health()
+        {
+            return Ok(new { status = "healthy", service = "AuthService", timestamp = DateTime.UtcNow });
+        }
+
+        [HttpPost("test")]
+        public IActionResult Test([FromBody] object data)
+        {
+            return Ok(new { message = "POST endpoint is working", receivedData = data, timestamp = DateTime.UtcNow });
+        }
+
+        [HttpGet("test")]
+        public IActionResult TestGet()
+        {
+            return Ok(new { message = "GET endpoint is working", timestamp = DateTime.UtcNow });
+        }
+
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterRequest req)
         {
-            if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password))
-                return BadRequest("Email and password are required.");
-
-            var exists = _context.AuthUsers.Any(u => u.Email == req.Email);
-            if (exists) return Conflict("Email already registered.");
-
-            var user = new AuthUser
+            try
             {
-                Email = req.Email,
-                PhoneNumber = req.PhoneNumber,
-                PasswordHash = BCryptNet.HashPassword(req.Password),
-                IsVerified = false
-            };
+                if (string.IsNullOrWhiteSpace(req.Email) || string.IsNullOrWhiteSpace(req.Password))
+                    return BadRequest("Email and password are required.");
 
-            _context.AuthUsers.Add(user);
-            _context.SaveChanges();
-            return Ok(new { message = "Registered successfully" });
+                var exists = _context.AuthUsers.Any(u => u.Email == req.Email);
+                if (exists) return Conflict("Email already registered.");
+
+                var user = new AuthUser
+                {
+                    Email = req.Email,
+                    PhoneNumber = req.PhoneNumber,
+                    PasswordHash = BCryptNet.HashPassword(req.Password),
+                    IsVerified = false
+                };
+
+                _context.AuthUsers.Add(user);
+                _context.SaveChanges();
+                return Ok(new { message = "Registered successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = "Registration failed", details = ex.Message });
+            }
         }
 
         [HttpPost("login")]
