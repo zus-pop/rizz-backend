@@ -1,12 +1,12 @@
+using Common.Domain;
+
 namespace AuthService.API.Models
 {
-	public class AuthUser
+	public class AuthUser : BaseEntity
 	{
-		public int Id { get; set; }
-		public string Email { get; set; }
-		public string PhoneNumber { get; set; }
-		public string PasswordHash { get; set; }
+		public string Email { get; set; } = string.Empty;
+		public string PhoneNumber { get; set; } = string.Empty;
+		public string PasswordHash { get; set; } = string.Empty;
 		public bool IsVerified { get; set; }
-		public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 	}
 }

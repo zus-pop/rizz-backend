@@ -33,6 +33,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiInsightsService", "AiInsi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiInsightsService.API", "services\AiInsightsService\AiInsightsService.API\AiInsightsService.API.csproj", "{87C1E8C2-AE3B-45FA-AD49-B620F53B7C11}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{8D5A9B7C-3F2E-4A1B-9C8D-7E6F5A4B3C9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Domain", "shared\Common.Domain\Common.Domain.csproj", "{1A2B3C4D-5E6F-7890-ABCD-EF1234567890}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Infrastructure", "shared\Common.Infrastructure\Common.Infrastructure.csproj", "{2B3C4D5E-6F78-90AB-CDEF-123456789012}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Application", "shared\Common.Application\Common.Application.csproj", "{3C4D5E6F-7890-ABCD-EF12-345678901234}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Contracts", "shared\Common.Contracts\Common.Contracts.csproj", "{4D5E6F78-90AB-CDEF-1234-567890123456}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
