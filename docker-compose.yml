@@ -1,202 +1,275 @@
 services:
-  # Infrastructure Services
-  postgres:
-    image: postgis/postgis:15-3.3-alpine
-    container_name: dating_postgres
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: ${RABBITMQ_CONTAINER:-rabbitmq}
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    networks:
+      - appnet
+
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Gateway.API/Dockerfile
+    container_name: ${GATEWAY_CONTAINER:-gateway}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - RabbitMq__Host=${RABBITMQ_HOST}
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - JWT_KEY=${JWT_KEY}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+    ports:
+      - "${GATEWAY_PORT:-5000}:8080"
     restart: unless-stopped
+    networks:
+      - appnet
+
+  aiinsights:
+    build:
+      context: .
+      dockerfile: services/AiInsightsService.API/Dockerfile
+    container_name: ${AIINSIGHTS_CONTAINER:-aiinsights}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - RabbitMq__Host=${RABBITMQ_HOST}
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_AI_INSIGHTS_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+    ports:
+      - "${AIINSIGHTS_PORT:-5001}:8080"
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  authservice:
+    build:
+      context: .
+      dockerfile: services/AuthService.API/Dockerfile
+    container_name: ${AUTHSERVICE_CONTAINER:-authservice}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_AUTH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    ports:
+      - "${AUTHSERVICE_PORT:-5002}:8080"
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  matchservice:
+    image: rizz-matchservice
+    container_name: ${MATCHSERVICE_CONTAINER:-matchservice}
+    build:
+      context: .
+      dockerfile: services/MatchService.API/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_MATCH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - RabbitMQ__Host=${RABBITMQ_HOST:-rabbitmq}
+      - RabbitMQ__User=${RABBITMQ_USER}
+      - RabbitMQ__Pass=${RABBITMQ_PASS}
+    ports:
+      - "${MATCHSERVICE_PORT:-5003}:8080"
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  messagingservice:
+    image: rizz-messagingservice
+    container_name: ${MESSAGINGSERVICE_CONTAINER:-messagingservice}
+    build:
+      context: .
+      dockerfile: services/MessagingService.API/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_MESSAGING_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - RabbitMq__Host=${RABBITMQ_HOST:-rabbitmq}
+      - RabbitMq__User=${RABBITMQ_USER}
+      - RabbitMq__Pass=${RABBITMQ_PASS}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    ports:
+      - "${MESSAGINGSERVICE_PORT:-5004}:8080"
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  moderationservice:
+    image: rizz-moderationservice
+    container_name: ${MODERATIONSERVICE_CONTAINER:-moderationservice}
+    build:
+      context: .
+      dockerfile: services/ModerationService.API/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_MODERATION_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - RabbitMq__Host=${RABBITMQ_HOST:-rabbitmq}
+      - RabbitMq__User=${RABBITMQ_USER}
+      - RabbitMq__Pass=${RABBITMQ_PASS}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    ports:
+      - "${MODERATIONSERVICE_PORT:-5005}:8080"
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  purchaseservice:
+    image: rizz-purchaseservice
+    container_name: ${PURCHASESERVICE_CONTAINER:-purchaseservice}
+    build:
+      context: .
+      dockerfile: services/PurchaseService.API/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_PURCHASE_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - RabbitMQ__HostName=${RABBITMQ_HOST:-rabbitmq}
+      - RabbitMQ__Port=5672
+      - RabbitMQ__UserName=${RABBITMQ_USER}
+      - RabbitMQ__Password=${RABBITMQ_PASS}
+    ports:
+      - "${PURCHASESERVICE_PORT:-5006}:8080"
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  pushservice:
+    image: rizz-pushservice
+    container_name: ${PUSHSERVICE_CONTAINER:-pushservice}
+    build:
+      context: .
+      dockerfile: services/PushService.API/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_PUSH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - Firebase__ProjectId=${FIREBASE_PROJECT_ID}
+      - Firebase__CredentialsPath=firebase-key.json
+      - RabbitMQ__Host=${RABBITMQ_HOST:-rabbitmq}
+      - RabbitMQ__User=${RABBITMQ_USER}
+      - RabbitMQ__Pass=${RABBITMQ_PASS}
+    ports:
+      - "${PUSHSERVICE_PORT:-5007}:8080"
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  notificationservice:
+    image: rizz-notificationservice
+    container_name: ${NOTIFICATIONSERVICE_CONTAINER:-notificationservice}
+    build:
+      context: .
+      dockerfile: services/NotificationService.API/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_NOTIFICATION_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - RabbitMQ__Host=${RABBITMQ_HOST:-rabbitmq}
+      - RabbitMQ__User=${RABBITMQ_USER}
+      - RabbitMQ__Pass=${RABBITMQ_PASS}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+    ports:
+      - "${NOTIFICATIONSERVICE_PORT:-5009}:8080"
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  userservice:
+    image: rizz-userservice
+    container_name: ${USERSERVICE_CONTAINER:-userservice}
+    build:
+      context: .
+      dockerfile: services/UserService.API/Dockerfile
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_USER_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - RabbitMQ__Host=${RABBITMQ_HOST:-rabbitmq}
+      - RabbitMQ__User=${RABBITMQ_USER}
+      - RabbitMQ__Pass=${RABBITMQ_PASS}
+    ports:
+      - "${USERSERVICE_PORT:-5008}:8080"
+    restart: unless-stopped
+    networks:
+      - appnet
+
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: ${POSTGRES_CONTAINER:-postgres}
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - appnet
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 30s
       timeout: 10s
       retries: 3
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: dating_rabbitmq
-    restart: unless-stopped
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-    ports:
-      - "5672:5672"     # RabbitMQ broker
-      - "15672:15672"   # Management UI
-    networks:
-      - appnet
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # API Gateway
-  gateway:
-    build: ./gateway/Gateway.API
-    container_name: dating_gateway
-    ports:
-      - "5000:80"
-    depends_on:
-      auth:
-        condition: service_healthy
-      users:
-        condition: service_healthy
-    environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-    networks:
-      - appnet
-    restart: unless-stopped
-
-  # Core Services
-  auth:
-    build:
-      context: .
-      dockerfile: ./services/AuthService/AuthService.API/Dockerfile
-    container_name: dating_auth
-    ports:
-      - "5001:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
-    environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_AUTH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      - Jwt__Key=${JWT_KEY}
-      - Jwt__Issuer=${JWT_ISSUER}
-      - Jwt__Audience=${JWT_AUDIENCE}
-    networks:
-      - appnet
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/auth/ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  users:
-    build:
-      context: .
-      dockerfile: ./services/UserService/UserService.API/Dockerfile
-    container_name: dating_users
-    ports:
-      - "5002:80"
-    depends_on:
-      - postgres
-      - rabbitmq
-    environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_DATING_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-    networks:
-      - appnet
-
-  match:
-    build:
-      context: .
-      dockerfile: ./services/MatchService/MatchService.API/Dockerfile
-    container_name: dating_match
-    ports:
-      - "5003:8080"
-    depends_on:
-      - postgres
-      - rabbitmq
-    environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_MATCH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      - RabbitMQ__Host=${RABBITMQ_HOST}
-      - RabbitMQ__User=${RABBITMQ_DEFAULT_USER}
-      - RabbitMQ__Pass=${RABBITMQ_DEFAULT_PASS}
-    networks:
-      - appnet
-  notify:
-    build:
-      context: .
-      dockerfile: ./services/NotificationService/NotificationService.API/Dockerfile
-    container_name: dating_notification
-    ports:
-      - "5004:8080"
-    depends_on:
-      - postgres
-      - rabbitmq
-    environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=notification_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      - RabbitMQ__Host=${RABBITMQ_HOST}
-      - RabbitMQ__User=${RABBITMQ_DEFAULT_USER}
-      - RabbitMQ__Pass=${RABBITMQ_DEFAULT_PASS}
-    networks:
-      - appnet
-  messaging:
-    build:
-      context: .
-      dockerfile: ./services/MessagingService/MessagingService.API/Dockerfile
-    container_name: dating_messaging
-    ports:
-      - "5005:8080"
-    depends_on:
-      - postgres
-      - rabbitmq
-    environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=messaging_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      - RabbitMQ__Host=${RABBITMQ_HOST}
-      - RabbitMQ__User=${RABBITMQ_DEFAULT_USER}
-      - RabbitMQ__Pass=${RABBITMQ_DEFAULT_PASS}
-    networks:
-      - appnet
-  ai-insights-service:
-    build:
-      context: .
-      dockerfile: ./services/AiInsightsService/AiInsightsService.API/Dockerfile
-    container_name: dating_ai_insights
-    ports:
-      - "5006:8080"
-    depends_on:
-      - postgres
-      - rabbitmq
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_AI_INSIGHTS_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-      - RabbitMQ__Host=${RABBITMQ_HOST}
-      - RabbitMQ__User=${RABBITMQ_DEFAULT_USER}
-      - RabbitMQ__Pass=${RABBITMQ_DEFAULT_PASS}
-    networks:
-      - appnet
-  purchase-service:
-    build:
-      context: .
-      dockerfile: ./services/PurchaseService/PurchaseService.API/Dockerfile
-    container_name: dating_purchase
-    ports:
-      - "5007:8080"
-    depends_on:
-      - postgres
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_PURCHASE_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
-    networks:
-      - appnet
-  moderation-service:
-    build:
-      context: .
-      dockerfile: ./services/ModerationService/ModerationService.API/Dockerfile
-    container_name: dating_moderation
-    ports:
-      - "5008:8080"
-    depends_on:
-      - postgres
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_MODERATION_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
     networks:
       - appnet
 
