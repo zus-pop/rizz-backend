@@ -414,7 +414,7 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/csharp
 
 # Testing and Documentation (Generated during development)
-docs/testing-results/
+docs/
 scripts/testing/
 scripts/utilities/
 
