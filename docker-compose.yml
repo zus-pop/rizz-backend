@@ -42,7 +42,7 @@ services:
   aiinsights:
     build:
       context: .
-      dockerfile: services/AiInsightsService.API/Dockerfile
+      dockerfile: services/AiInsightsService/Dockerfile
     container_name: ${AIINSIGHTS_CONTAINER:-aiinsights}
     depends_on:
       rabbitmq:
@@ -62,7 +62,7 @@ services:
   authservice:
     build:
       context: .
-      dockerfile: services/AuthService.API/Dockerfile
+      dockerfile: services/AuthService/Dockerfile
     container_name: ${AUTHSERVICE_CONTAINER:-authservice}
     depends_on:
       rabbitmq:
@@ -86,7 +86,7 @@ services:
     container_name: ${MATCHSERVICE_CONTAINER:-matchservice}
     build:
       context: .
-      dockerfile: services/MatchService.API/Dockerfile
+      dockerfile: services/MatchService/Dockerfile
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -109,7 +109,7 @@ services:
     container_name: ${MESSAGINGSERVICE_CONTAINER:-messagingservice}
     build:
       context: .
-      dockerfile: services/MessagingService.API/Dockerfile
+      dockerfile: services/MessagingService/Dockerfile
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -135,7 +135,7 @@ services:
     container_name: ${MODERATIONSERVICE_CONTAINER:-moderationservice}
     build:
       context: .
-      dockerfile: services/ModerationService.API/Dockerfile
+      dockerfile: services/ModerationService/Dockerfile
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -161,7 +161,7 @@ services:
     container_name: ${PURCHASESERVICE_CONTAINER:-purchaseservice}
     build:
       context: .
-      dockerfile: services/PurchaseService.API/Dockerfile
+      dockerfile: services/PurchaseService/Dockerfile
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -185,17 +185,18 @@ services:
     container_name: ${PUSHSERVICE_CONTAINER:-pushservice}
     build:
       context: .
-      dockerfile: services/PushService.API/Dockerfile
+      dockerfile: services/PushService/Dockerfile
     depends_on:
       rabbitmq:
         condition: service_healthy
       postgres:
         condition: service_healthy
     environment:
-      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_PUSH_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - ConnectionStrings__DefaultConnection=Host=${POSTGRES_HOST:-postgres};Port=5432;Database=${POSTGRES_PUSH_DB:-push_db};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - Firebase__ProjectId=${FIREBASE_PROJECT_ID}
-      - Firebase__CredentialsPath=firebase-key.json
+      - Firebase__ServiceAccountJson=${FIREBASE_SERVICE_ACCOUNT_JSON}
+      - Firebase__ServiceAccountKeyPath=${FIREBASE_SERVICE_ACCOUNT_KEY_PATH}
       - RabbitMQ__Host=${RABBITMQ_HOST:-rabbitmq}
       - RabbitMQ__User=${RABBITMQ_USER}
       - RabbitMQ__Pass=${RABBITMQ_PASS}
@@ -204,13 +205,19 @@ services:
     restart: unless-stopped
     networks:
       - appnet
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   notificationservice:
     image: rizz-notificationservice
     container_name: ${NOTIFICATIONSERVICE_CONTAINER:-notificationservice}
     build:
       context: .
-      dockerfile: services/NotificationService.API/Dockerfile
+      dockerfile: services/NotificationService/Dockerfile
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -236,7 +243,7 @@ services:
     container_name: ${USERSERVICE_CONTAINER:-userservice}
     build:
       context: .
-      dockerfile: services/UserService.API/Dockerfile
+      dockerfile: services/UserService/Dockerfile
     depends_on:
       rabbitmq:
         condition: service_healthy

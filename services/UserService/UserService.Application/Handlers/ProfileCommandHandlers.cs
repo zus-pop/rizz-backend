@@ -1,0 +1,99 @@
+using AutoMapper;
+using MediatR;
+using UserService.Application.Commands;
+using UserService.Application.DTOs;
+using UserService.Application.Queries;
+using UserService.Domain.Entities;
+using UserService.Domain.Repositories;
+using DomainProfile = UserService.Domain.Entities.Profile;
+
+namespace UserService.Application.Handlers
+{
+    public class ProfileCommandHandlers : 
+        IRequestHandler<CreateProfileCommand, ProfileDto>,
+        IRequestHandler<UpdateProfileCommand, ProfileDto>,
+        IRequestHandler<DeleteProfileCommand, bool>
+    {
+        private readonly IProfileRepository _profileRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
+
+        public ProfileCommandHandlers(IProfileRepository profileRepository, IUserRepository userRepository, IMapper mapper)
+        {
+            _profileRepository = profileRepository;
+            _userRepository = userRepository;
+            _mapper = mapper;
+        }
+
+        public async Task<ProfileDto> Handle(CreateProfileCommand request, CancellationToken cancellationToken)
+        {
+            // Check if user exists
+            if (!await _userRepository.ExistsAsync(request.UserId, cancellationToken))
+                throw new ArgumentException("User not found");
+
+            // Check if profile already exists for this user
+            if (await _profileRepository.ExistsAsync(request.UserId, cancellationToken))
+                throw new ArgumentException("Profile already exists for this user");
+
+            var profile = new DomainProfile(request.UserId);
+            
+            if (!string.IsNullOrEmpty(request.Bio))
+                profile.SetBio(request.Bio);
+            
+            if (!string.IsNullOrEmpty(request.Job))
+                profile.SetJob(request.Job);
+            
+            if (!string.IsNullOrEmpty(request.School))
+                profile.SetSchool(request.School);
+            
+            profile.SetInterestedInAgeRange(request.InterestedInAgeMin, request.InterestedInAgeMax);
+            profile.SetInterestedInGender(request.InterestedInGender);
+            profile.SetMaxDistance(request.MaxDistanceKm);
+            profile.SetShowOnlyVerified(request.ShowOnlyVerified);
+
+            var createdProfile = await _profileRepository.AddAsync(profile, cancellationToken);
+            return _mapper.Map<ProfileDto>(createdProfile);
+        }
+
+        public async Task<ProfileDto> Handle(UpdateProfileCommand request, CancellationToken cancellationToken)
+        {
+            var profile = await _profileRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+            if (profile == null)
+                throw new ArgumentException("Profile not found");
+
+            if (request.Bio != null)
+                profile.SetBio(request.Bio);
+            
+            if (request.Job != null)
+                profile.SetJob(request.Job);
+            
+            if (request.School != null)
+                profile.SetSchool(request.School);
+            
+            if (request.InterestedInAgeMin.HasValue || request.InterestedInAgeMax.HasValue)
+                profile.SetInterestedInAgeRange(request.InterestedInAgeMin, request.InterestedInAgeMax);
+            
+            if (request.InterestedInGender != null)
+                profile.SetInterestedInGender(request.InterestedInGender);
+            
+            if (request.MaxDistanceKm.HasValue)
+                profile.SetMaxDistance(request.MaxDistanceKm);
+            
+            if (request.ShowOnlyVerified.HasValue)
+                profile.SetShowOnlyVerified(request.ShowOnlyVerified.Value);
+
+            await _profileRepository.UpdateAsync(profile, cancellationToken);
+            return _mapper.Map<ProfileDto>(profile);
+        }
+
+        public async Task<bool> Handle(DeleteProfileCommand request, CancellationToken cancellationToken)
+        {
+            var profile = await _profileRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+            if (profile == null)
+                return false;
+
+            await _profileRepository.DeleteAsync(profile.Id, cancellationToken);
+            return true;
+        }
+    }
+}
