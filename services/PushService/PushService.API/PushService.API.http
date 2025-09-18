@@ -1,0 +1,83 @@
+@PushService_HostAddress = http://localhost:5147
+
+### Health Check
+GET {{PushService_HostAddress}}/health
+
+### Get all device tokens (for testing)
+GET {{PushService_HostAddress}}/api/device-tokens
+
+### Register a new device token (iOS)
+POST {{PushService_HostAddress}}/api/device-tokens
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "token": "sample-ios-device-token-123456789abcdef",
+  "deviceType": "iOS",
+  "deviceId": "iPhone-123-Test"
+}
+
+### Register a new device token (Android)
+POST {{PushService_HostAddress}}/api/device-tokens
+Content-Type: application/json
+
+{
+  "userId": 2,
+  "token": "sample-android-device-token-987654321fedcba",
+  "deviceType": "Android", 
+  "deviceId": "Android-456-Test"
+}
+
+### Get device tokens by user ID
+GET {{PushService_HostAddress}}/api/device-tokens/user/1
+
+### Send push notification to specific user
+POST {{PushService_HostAddress}}/api/notifications/send
+Content-Type: application/json
+
+{
+  "userId": 1,
+  "title": "Test Notification",
+  "body": "This is a test push notification from PushService",
+  "data": {
+    "type": "test",
+    "timestamp": "2024-09-17T16:42:00Z"
+  }
+}
+
+### Send push notification to multiple users
+POST {{PushService_HostAddress}}/api/notifications/broadcast
+Content-Type: application/json
+
+{
+  "userIds": [1, 2],
+  "title": "Broadcast Test",
+  "body": "This is a broadcast notification to multiple users",
+  "data": {
+    "type": "broadcast",
+    "timestamp": "2024-09-17T16:42:00Z"
+  }
+}
+
+### Validate a device token
+POST {{PushService_HostAddress}}/api/device-tokens/validate
+Content-Type: application/json
+
+{
+  "token": "sample-ios-device-token-123456789abcdef"
+}
+
+### Delete a device token
+DELETE {{PushService_HostAddress}}/api/device-tokens/1
+
+### Test Firebase notification to specific token
+POST {{PushService_HostAddress}}/api/notifications/send-to-token
+Content-Type: application/json
+
+{
+  "token": "sample-ios-device-token-123456789abcdef",
+  "title": "Direct Token Test",
+  "body": "Testing direct token notification",
+  "priority": "High",
+  "sound": "default"
+}
