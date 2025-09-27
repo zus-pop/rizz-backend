@@ -3,8 +3,11 @@ using AuthService.Domain.Interfaces;
 using AuthService.Infrastructure;
 using AuthService.Infrastructure.Data;
 using AuthService.Infrastructure.Repositories;
+using AuthService.Infrastructure.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 namespace AuthService.API;
 
@@ -14,10 +17,41 @@ public static class DependencyInjection
     {
         services.AddDbContext<AuthDbContext>(options =>
             options.UseNpgsql(config.GetConnectionString("DefaultConnection"), 
-                b => b.MigrationsAssembly("AuthService.API")));
+                b => b.MigrationsAssembly("AuthService.Infrastructure")));
+        
+        // Repository registrations
         services.AddScoped<IAuthUserRepository, AuthUserRepository>();
+        services.AddScoped<IOtpCodeRepository, OtpCodeRepository>();
+        
+        // Service registrations
         services.AddScoped<IJwtProvider, JwtProvider>();
+        services.AddScoped<IOtpService, OtpService>();
+        
+        // MediatR registration
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(RegisterUserCommandHandler).Assembly));
+        
+        // Rate limiting configuration
+        services.AddRateLimiter(options =>
+        {
+            // General auth endpoints rate limiting
+            options.AddFixedWindowLimiter("AuthPolicy", limiterOptions =>
+            {
+                limiterOptions.PermitLimit = 10;
+                limiterOptions.Window = TimeSpan.FromMinutes(1);
+                limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                limiterOptions.QueueLimit = 2;
+            });
+            
+            // OTP endpoints rate limiting
+            options.AddFixedWindowLimiter("OtpPolicy", limiterOptions =>
+            {
+                limiterOptions.PermitLimit = 3;
+                limiterOptions.Window = TimeSpan.FromMinutes(5);
+                limiterOptions.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                limiterOptions.QueueLimit = 0;
+            });
+        });
+        
         return services;
     }
 }
