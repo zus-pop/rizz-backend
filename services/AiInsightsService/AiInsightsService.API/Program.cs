@@ -65,7 +65,7 @@ app.MapHealthChecks("/health");
 app.MapControllers();
 
 // Configure to listen on all interfaces
-app.Urls.Add("http://0.0.0.0:8081");
+app.Urls.Add("http://0.0.0.0:8080");
 
 app.Run();
 

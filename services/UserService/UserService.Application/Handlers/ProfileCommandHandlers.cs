@@ -77,17 +77,18 @@ namespace UserService.Application.Handlers
             if (!string.IsNullOrEmpty(request.LoveLanguage))
                 profile.SetLoveLanguage(request.LoveLanguage);
             
-            // Legacy fields for backward compatibility
-            if (!string.IsNullOrEmpty(request.Job))
-                profile.SetJob(request.Job);
+            // New Vietnamese localization fields
+            if (request.Emotion.HasValue)
+                profile.SetEmotion(request.Emotion.Value);
+                
+            if (request.VoiceQuality.HasValue)
+                profile.SetVoiceQuality(request.VoiceQuality.Value);
+                
+            if (request.Accent.HasValue)
+                profile.SetAccent(request.Accent.Value);
             
-            if (!string.IsNullOrEmpty(request.School))
-                profile.SetSchool(request.School);
-            
-            profile.SetInterestedInAgeRange(request.InterestedInAgeMin, request.InterestedInAgeMax);
-            profile.SetInterestedInGender(request.InterestedInGender);
-            profile.SetMaxDistance(request.MaxDistanceKm);
-            profile.SetShowOnlyVerified(request.ShowOnlyVerified);
+            // Legacy fields for backward compatibility - these will be ignored since methods don't exist
+            // The legacy properties are kept in commands for backward compatibility but not processed
 
             var createdProfile = await _profileRepository.AddAsync(profile, cancellationToken);
             return _mapper.Map<ProfileDto>(createdProfile);
@@ -139,24 +140,18 @@ namespace UserService.Application.Handlers
             if (request.LoveLanguage != null)
                 profile.SetLoveLanguage(request.LoveLanguage);
             
-            // Legacy fields for backward compatibility
-            if (request.Job != null)
-                profile.SetJob(request.Job);
+            // New Vietnamese localization fields
+            if (request.Emotion.HasValue)
+                profile.SetEmotion(request.Emotion.Value);
+                
+            if (request.VoiceQuality.HasValue)
+                profile.SetVoiceQuality(request.VoiceQuality.Value);
+                
+            if (request.Accent.HasValue)
+                profile.SetAccent(request.Accent.Value);
             
-            if (request.School != null)
-                profile.SetSchool(request.School);
-            
-            if (request.InterestedInAgeMin.HasValue || request.InterestedInAgeMax.HasValue)
-                profile.SetInterestedInAgeRange(request.InterestedInAgeMin, request.InterestedInAgeMax);
-            
-            if (request.InterestedInGender != null)
-                profile.SetInterestedInGender(request.InterestedInGender);
-            
-            if (request.MaxDistanceKm.HasValue)
-                profile.SetMaxDistance(request.MaxDistanceKm);
-            
-            if (request.ShowOnlyVerified.HasValue)
-                profile.SetShowOnlyVerified(request.ShowOnlyVerified.Value);
+            // Legacy fields for backward compatibility - these will be ignored since methods don't exist
+            // The legacy properties are kept in commands for backward compatibility but not processed
 
             await _profileRepository.UpdateAsync(profile, cancellationToken);
             return _mapper.Map<ProfileDto>(profile);

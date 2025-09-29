@@ -12,7 +12,6 @@ public class AuthUser
     public DateTime? VerifiedAt { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
-    public int FailedLoginAttempts { get; set; }
     public DateTime? LockoutEnd { get; set; }
     
     // Refresh token properties
@@ -42,19 +41,14 @@ public class AuthUser
         }
     }
 
-    public void IncrementFailedLogins()
+    public void SetLockout(int minutes)
     {
-        FailedLoginAttempts++;
-        if (FailedLoginAttempts >= 5)
-        {
-            LockoutEnd = DateTime.UtcNow.AddMinutes(15); // 15 minute lockout
-        }
+        LockoutEnd = DateTime.UtcNow.AddMinutes(minutes);
         UpdatedAt = DateTime.UtcNow;
     }
 
-    public void ResetFailedLogins()
+    public void ClearLockout()
     {
-        FailedLoginAttempts = 0;
         LockoutEnd = null;
         UpdatedAt = DateTime.UtcNow;
     }

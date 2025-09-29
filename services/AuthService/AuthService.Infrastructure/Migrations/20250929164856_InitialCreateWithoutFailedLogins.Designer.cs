@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuthService.Infrastructure.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20250927151812_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250929164856_InitialCreateWithoutFailedLogins")]
+    partial class InitialCreateWithoutFailedLogins
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,9 +40,6 @@ namespace AuthService.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
-
-                    b.Property<int>("FailedLoginAttempts")
-                        .HasColumnType("integer");
 
                     b.Property<bool>("IsEmailVerified")
                         .HasColumnType("boolean");
