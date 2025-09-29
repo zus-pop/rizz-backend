@@ -64,6 +64,20 @@ namespace UserService.API.Controllers
                 {
                     UserId = request.UserId,
                     Bio = request.Bio,
+                    Voice = request.Voice,
+                    University = request.University,
+                    InterestedIn = request.InterestedIn,
+                    LookingFor = request.LookingFor,
+                    StudyStyle = request.StudyStyle,
+                    WeekendHobby = request.WeekendHobby,
+                    CampusLife = request.CampusLife,
+                    FuturePlan = request.FuturePlan,
+                    CommunicationPreference = request.CommunicationPreference,
+                    DealBreakers = request.DealBreakers,
+                    Zodiac = request.Zodiac,
+                    LoveLanguage = request.LoveLanguage,
+                    
+                    // Legacy fields
                     Job = request.Job,
                     School = request.School,
                     InterestedInAgeMin = request.InterestedInAgeMin,
@@ -97,6 +111,20 @@ namespace UserService.API.Controllers
                 {
                     UserId = userId,
                     Bio = dto.Bio,
+                    Voice = dto.Voice,
+                    University = dto.University,
+                    InterestedIn = dto.InterestedIn,
+                    LookingFor = dto.LookingFor,
+                    StudyStyle = dto.StudyStyle,
+                    WeekendHobby = dto.WeekendHobby,
+                    CampusLife = dto.CampusLife,
+                    FuturePlan = dto.FuturePlan,
+                    CommunicationPreference = dto.CommunicationPreference,
+                    DealBreakers = dto.DealBreakers,
+                    Zodiac = dto.Zodiac,
+                    LoveLanguage = dto.LoveLanguage,
+                    
+                    // Legacy fields
                     Job = dto.Job,
                     School = dto.School,
                     InterestedInAgeMin = dto.InterestedInAgeMin,
@@ -188,6 +216,20 @@ namespace UserService.API.Controllers
     {
         public int UserId { get; set; }
         public string? Bio { get; set; }
+        public string? Voice { get; set; }
+        public string? University { get; set; }
+        public string? InterestedIn { get; set; }
+        public string? LookingFor { get; set; }
+        public string? StudyStyle { get; set; }
+        public string? WeekendHobby { get; set; }
+        public string? CampusLife { get; set; }
+        public string? FuturePlan { get; set; }
+        public string? CommunicationPreference { get; set; }
+        public string? DealBreakers { get; set; }
+        public string? Zodiac { get; set; }
+        public string? LoveLanguage { get; set; }
+        
+        // Legacy fields for backward compatibility
         public string? Job { get; set; }
         public string? School { get; set; }
         public int? InterestedInAgeMin { get; set; }
