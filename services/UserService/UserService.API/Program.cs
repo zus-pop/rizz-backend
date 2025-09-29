@@ -1,6 +1,10 @@
 using UserService.API.Extensions;
+using UserService.API.Middleware;
 using UserService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +23,29 @@ builder.Services.AddSwaggerGen(c =>
 // Add UserService specific services
 builder.Services.AddUserServices(builder.Configuration);
 
+// JWT Authentication
+var jwtKey = builder.Configuration["Jwt:Key"] ?? "super-secret-key-for-development-only-min-32-chars";
+var key = Encoding.ASCII.GetBytes(jwtKey);
+
+builder.Services.AddAuthentication(x =>
+{
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false;
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -31,6 +58,9 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Add global exception handling middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Database migration with retry logic
 for (int retry = 0; retry < 5; retry++)
@@ -83,8 +113,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseHttpsRedirection();
 app.UseCors();
-app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Health check endpoints

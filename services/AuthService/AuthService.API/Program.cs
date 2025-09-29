@@ -1,5 +1,6 @@
 ﻿using AuthService.Infrastructure.Data;
 using AuthService.API;
+using AuthService.API.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -66,6 +67,9 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
+
+// Add global exception handling middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Database migration
 try {

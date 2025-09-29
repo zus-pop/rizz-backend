@@ -2,6 +2,7 @@ using MediatR;
 using AuthService.Application.Commands;
 using AuthService.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace AuthService.Application.Handlers
 {
@@ -174,7 +175,7 @@ namespace AuthService.Application.Handlers
                 if (newJwt == null) return null;
 
                 // Rotate refresh token: find user and issue a new refresh token
-                var principal = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().ReadJwtToken(request.Token);
+                var principal = new JwtSecurityTokenHandler().ReadJwtToken(request.Token);
                 var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (int.TryParse(userIdClaim, out var userId))
                 {

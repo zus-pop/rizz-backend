@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.Authorization;
 using MediatR;
 using AuthService.Application.Commands;
 using AuthService.Application.Queries;
@@ -75,6 +76,7 @@ namespace AuthService.API.Controllers
 
         [HttpPost("send-email-otp")]
         [EnableRateLimiting("OtpPolicy")]
+        [Authorize]
         public async Task<IActionResult> SendEmailOtp([FromBody] GenerateEmailOtpRequest req)
         {
             try
@@ -97,6 +99,7 @@ namespace AuthService.API.Controllers
 
         [HttpPost("send-phone-otp")]
         [EnableRateLimiting("OtpPolicy")]
+        [Authorize]
         public async Task<IActionResult> SendPhoneOtp([FromBody] GeneratePhoneOtpRequest req)
         {
             try
@@ -119,6 +122,7 @@ namespace AuthService.API.Controllers
 
         [HttpPost("verify-email")]
         [EnableRateLimiting("OtpPolicy")]
+        [Authorize]
         public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequest req)
         {
             try
@@ -141,6 +145,7 @@ namespace AuthService.API.Controllers
 
         [HttpPost("verify-phone")]
         [EnableRateLimiting("OtpPolicy")]
+        [Authorize]
         public async Task<IActionResult> VerifyPhone([FromBody] VerifyPhoneRequest req)
         {
             try

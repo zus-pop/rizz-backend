@@ -1,6 +1,9 @@
 using MessagingService.Application;
 using MessagingService.Infrastructure;
 using MessagingService.Infrastructure.Data;
+using MessagingService.API.Hubs;
+using MessagingService.API.Services;
+using MessagingService.API.EventHandlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -25,6 +28,15 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
+// Add SignalR
+builder.Services.AddSignalR();
+
+// Add RabbitMQ Publisher
+builder.Services.AddSingleton<RabbitMqPublisher>();
+
+// Add API Event Handlers
+builder.Services.AddScoped<MessageEventPublisher>();
+
 // JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "super-secret-key-for-development-only-min-32-chars";
 var key = Encoding.ASCII.GetBytes(jwtKey);
@@ -46,6 +58,21 @@ builder.Services.AddAuthentication(x =>
         ValidateAudience = false,
         ClockSkew = TimeSpan.Zero
     };
+    
+    // Allow JWT authentication for SignalR
+    x.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var accessToken = context.Request.Query["access_token"];
+            var path = context.HttpContext.Request.Path;
+            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chatHub"))
+            {
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // CORS
@@ -56,6 +83,14 @@ builder.Services.AddCors(options =>
         policy.AllowAnyOrigin()
               .AllowAnyMethod()
               .AllowAnyHeader();
+    });
+    
+    options.AddPolicy("SignalRPolicy", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "https://localhost:3000") // Add your frontend URLs
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 
@@ -77,6 +112,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Map SignalR Hub
+app.MapHub<ChatHub>("/chatHub");
 
 // Health check endpoint
 app.MapHealthChecks("/health");
