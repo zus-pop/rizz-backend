@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using UserService.Application.Commands;
 using UserService.Application.DTOs;
 using UserService.Application.Queries;
+using UserService.Domain.Enums;
 
 namespace UserService.API.Controllers
 {
@@ -77,14 +78,10 @@ namespace UserService.API.Controllers
                     Zodiac = request.Zodiac,
                     LoveLanguage = request.LoveLanguage,
                     
-                    // Legacy fields
-                    Job = request.Job,
-                    School = request.School,
-                    InterestedInAgeMin = request.InterestedInAgeMin,
-                    InterestedInAgeMax = request.InterestedInAgeMax,
-                    InterestedInGender = request.InterestedInGender,
-                    MaxDistanceKm = request.MaxDistanceKm,
-                    ShowOnlyVerified = request.ShowOnlyVerified
+                    // New Vietnamese localization fields
+                    Emotion = request.Emotion,
+                    VoiceQuality = request.VoiceQuality,
+                    Accent = request.Accent
                 };
 
                 var profile = await _mediator.Send(command);
@@ -124,14 +121,10 @@ namespace UserService.API.Controllers
                     Zodiac = dto.Zodiac,
                     LoveLanguage = dto.LoveLanguage,
                     
-                    // Legacy fields
-                    Job = dto.Job,
-                    School = dto.School,
-                    InterestedInAgeMin = dto.InterestedInAgeMin,
-                    InterestedInAgeMax = dto.InterestedInAgeMax,
-                    InterestedInGender = dto.InterestedInGender,
-                    MaxDistanceKm = dto.MaxDistanceKm,
-                    ShowOnlyVerified = dto.ShowOnlyVerified
+                    // New Vietnamese localization fields
+                    Emotion = dto.Emotion,
+                    VoiceQuality = dto.VoiceQuality,
+                    Accent = dto.Accent
                 };
 
                 var profile = await _mediator.Send(command);
@@ -172,6 +165,8 @@ namespace UserService.API.Controllers
             }
         }
 
+        // TODO: Re-implement profile matching with new Vietnamese schema
+        /*
         [HttpGet("matches/{userId}")]
         public async Task<IActionResult> GetProfileMatches(int userId, 
             [FromQuery] double? latitude = null,
@@ -210,6 +205,7 @@ namespace UserService.API.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+        */
     }
 
     public class CreateProfileRequest
@@ -229,13 +225,9 @@ namespace UserService.API.Controllers
         public string? Zodiac { get; set; }
         public string? LoveLanguage { get; set; }
         
-        // Legacy fields for backward compatibility
-        public string? Job { get; set; }
-        public string? School { get; set; }
-        public int? InterestedInAgeMin { get; set; }
-        public int? InterestedInAgeMax { get; set; }
-        public string? InterestedInGender { get; set; }
-        public double? MaxDistanceKm { get; set; }
-        public bool ShowOnlyVerified { get; set; }
+        // New Vietnamese localization fields
+        public EmotionType? Emotion { get; set; }
+        public VoiceQualityType? VoiceQuality { get; set; }
+        public AccentType? Accent { get; set; }
     }
 }

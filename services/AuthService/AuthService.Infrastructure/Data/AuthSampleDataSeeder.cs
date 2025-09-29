@@ -24,8 +24,7 @@ namespace AuthService.Infrastructure.Data
                     IsEmailVerified = true,
                     IsPhoneVerified = true,
                     VerifiedAt = DateTime.UtcNow.AddDays(-30),
-                    CreatedAt = DateTime.UtcNow.AddDays(-30),
-                    FailedLoginAttempts = 0
+                    CreatedAt = DateTime.UtcNow.AddDays(-30)
                 },
                 new AuthUser
                 {
@@ -35,8 +34,7 @@ namespace AuthService.Infrastructure.Data
                     IsVerified = false,
                     IsEmailVerified = false,
                     IsPhoneVerified = false,
-                    CreatedAt = DateTime.UtcNow.AddDays(-25),
-                    FailedLoginAttempts = 0
+                    CreatedAt = DateTime.UtcNow.AddDays(-25)
                 },
                 new AuthUser
                 {
@@ -47,8 +45,7 @@ namespace AuthService.Infrastructure.Data
                     IsEmailVerified = true,
                     IsPhoneVerified = true,
                     VerifiedAt = DateTime.UtcNow.AddDays(-20),
-                    CreatedAt = DateTime.UtcNow.AddDays(-20),
-                    FailedLoginAttempts = 0
+                    CreatedAt = DateTime.UtcNow.AddDays(-20)
                 },
                 new AuthUser
                 {
@@ -59,8 +56,7 @@ namespace AuthService.Infrastructure.Data
                     IsEmailVerified = true,
                     IsPhoneVerified = true,
                     VerifiedAt = DateTime.UtcNow.AddDays(-15),
-                    CreatedAt = DateTime.UtcNow.AddDays(-15),
-                    FailedLoginAttempts = 0
+                    CreatedAt = DateTime.UtcNow.AddDays(-15)
                 },
                 new AuthUser
                 {
@@ -70,8 +66,7 @@ namespace AuthService.Infrastructure.Data
                     IsVerified = false,
                     IsEmailVerified = true,
                     IsPhoneVerified = false,
-                    CreatedAt = DateTime.UtcNow.AddDays(-10),
-                    FailedLoginAttempts = 0
+                    CreatedAt = DateTime.UtcNow.AddDays(-10)
                 },
                 new AuthUser
                 {
@@ -82,8 +77,7 @@ namespace AuthService.Infrastructure.Data
                     IsEmailVerified = true,
                     IsPhoneVerified = true,
                     VerifiedAt = DateTime.UtcNow.AddDays(-5),
-                    CreatedAt = DateTime.UtcNow.AddDays(-5),
-                    FailedLoginAttempts = 0
+                    CreatedAt = DateTime.UtcNow.AddDays(-5)
                 },
                 new AuthUser
                 {
@@ -94,8 +88,7 @@ namespace AuthService.Infrastructure.Data
                     IsEmailVerified = true,
                     IsPhoneVerified = true,
                     VerifiedAt = DateTime.UtcNow.AddDays(-100),
-                    CreatedAt = DateTime.UtcNow.AddDays(-100),
-                    FailedLoginAttempts = 0
+                    CreatedAt = DateTime.UtcNow.AddDays(-100)
                 },
                 new AuthUser
                 {
@@ -106,8 +99,7 @@ namespace AuthService.Infrastructure.Data
                     IsEmailVerified = true,
                     IsPhoneVerified = true,
                     VerifiedAt = DateTime.UtcNow.AddDays(-1),
-                    CreatedAt = DateTime.UtcNow.AddDays(-1),
-                    FailedLoginAttempts = 0
+                    CreatedAt = DateTime.UtcNow.AddDays(-1)
                 }
             };
 

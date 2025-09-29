@@ -13,8 +13,8 @@ using UserService.Infrastructure.Data;
 namespace UserService.Infrastructure.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20250917154648_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250929145009_VietnameseDatingAppSchema")]
+    partial class VietnameseDatingAppSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -164,30 +164,38 @@ namespace UserService.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AgeMax")
+                    b.Property<string>("Accent")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("AgeRangeMax")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("AgeMin")
+                    b.Property<int?>("AgeRangeMin")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("InterestedInGender")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<string>("Emotion")
+                        .HasColumnType("text");
 
-                    b.Property<double?>("MaxDistanceKm")
-                        .HasColumnType("double precision");
+                    b.Property<string>("InterestsFilter")
+                        .HasColumnType("jsonb");
 
-                    b.Property<bool>("ShowOnlyVerified")
-                        .HasColumnType("boolean");
+                    b.Property<int?>("LocationRadiusKm")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("LookingForGender")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("VoiceQuality")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -205,42 +213,75 @@ namespace UserService.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Accent")
+                        .HasColumnType("text");
+
                     b.Property<string>("Bio")
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
+                    b.Property<string>("CampusLife")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("CommunicationPreference")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("InterestedInAgeMax")
-                        .HasColumnType("integer");
+                    b.Property<string>("DealBreakers")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
-                    b.Property<int?>("InterestedInAgeMin")
-                        .HasColumnType("integer");
+                    b.Property<string>("Emotion")
+                        .HasColumnType("text");
 
-                    b.Property<string>("InterestedInGender")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<string>("FuturePlan")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
-                    b.Property<string>("Job")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.Property<string>("InterestedIn")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
-                    b.Property<double?>("MaxDistanceKm")
-                        .HasColumnType("double precision");
+                    b.Property<string>("LookingFor")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
-                    b.Property<string>("School")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                    b.Property<string>("LoveLanguage")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
-                    b.Property<bool>("ShowOnlyVerified")
-                        .HasColumnType("boolean");
+                    b.Property<string>("StudyStyle")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("University")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Voice")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("VoiceQuality")
+                        .HasColumnType("text");
+
+                    b.Property<string>("WeekendHobby")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Zodiac")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.HasKey("Id");
 

@@ -29,15 +29,15 @@ public class LoginUserCommandHandler : IRequestHandler<LoginUserCommand, LoginUs
 
         if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
         {
-            // Increment failed login attempts
-            user.IncrementFailedLogins();
+            // Set a lockout for failed login (could be enhanced with attempt tracking)
+            user.SetLockout(15); // 15 minute lockout
             await _userRepo.UpdateAsync(user);
             await _userRepo.SaveChangesAsync();
             return null;
         }
 
-        // Reset failed login attempts on successful login
-        user.ResetFailedLogins();
+        // Clear any existing lockout on successful login
+        user.ClearLockout();
         
         // Generate tokens
         var accessToken = _jwtProvider.GenerateJwtToken(user);

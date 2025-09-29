@@ -161,30 +161,38 @@ namespace UserService.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AgeMax")
+                    b.Property<string>("Accent")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("AgeRangeMax")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("AgeMin")
+                    b.Property<int?>("AgeRangeMin")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("InterestedInGender")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                    b.Property<string>("Emotion")
+                        .HasColumnType("text");
 
-                    b.Property<double?>("MaxDistanceKm")
-                        .HasColumnType("double precision");
+                    b.Property<string>("InterestsFilter")
+                        .HasColumnType("jsonb");
 
-                    b.Property<bool>("ShowOnlyVerified")
-                        .HasColumnType("boolean");
+                    b.Property<int?>("LocationRadiusKm")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("LookingForGender")
+                        .HasColumnType("text");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
+
+                    b.Property<string>("VoiceQuality")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -201,6 +209,9 @@ namespace UserService.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Accent")
+                        .HasColumnType("text");
 
                     b.Property<string>("Bio")
                         .HasMaxLength(1000)
@@ -221,6 +232,9 @@ namespace UserService.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<string>("Emotion")
+                        .HasColumnType("text");
+
                     b.Property<string>("FuturePlan")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -229,20 +243,6 @@ namespace UserService.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<int?>("InterestedInAgeMax")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("InterestedInAgeMin")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("InterestedInGender")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("Job")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<string>("LookingFor")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -250,16 +250,6 @@ namespace UserService.Infrastructure.Migrations
                     b.Property<string>("LoveLanguage")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
-
-                    b.Property<double?>("MaxDistanceKm")
-                        .HasColumnType("double precision");
-
-                    b.Property<string>("School")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<bool>("ShowOnlyVerified")
-                        .HasColumnType("boolean");
 
                     b.Property<string>("StudyStyle")
                         .HasMaxLength(300)
@@ -278,6 +268,9 @@ namespace UserService.Infrastructure.Migrations
                     b.Property<string>("Voice")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
+
+                    b.Property<string>("VoiceQuality")
+                        .HasColumnType("text");
 
                     b.Property<string>("WeekendHobby")
                         .HasMaxLength(300)

@@ -91,7 +91,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddHealthChecks()
     .AddCheck("gateway_health", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Gateway is running"))
     .AddUrlGroup(new Uri("http://aiinsights:8080/health"), "aiinsights")
-    .AddUrlGroup(new Uri("http://authservice:8080/health"), "authservice")
+    .AddUrlGroup(new Uri("http://authservice:8081/health"), "authservice")
     .AddUrlGroup(new Uri("http://matchservice:8080/health"), "matchservice")
     .AddUrlGroup(new Uri("http://messagingservice:8080/health"), "messagingservice")
     .AddUrlGroup(new Uri("http://moderationservice:8080/health"), "moderationservice")
@@ -201,7 +201,7 @@ app.MapControllers();
 // Map the reverse proxy - YARP will handle all routing based on appsettings.json configuration
 app.MapReverseProxy();
 
-// Configure to listen on all interfaces
-app.Urls.Add("http://0.0.0.0:8080");
+// Configure to listen on all interfaces (use port 5000 for gateway)
+app.Urls.Add("http://0.0.0.0:5000");
 
 app.Run();

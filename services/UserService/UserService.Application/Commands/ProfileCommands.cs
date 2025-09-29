@@ -1,5 +1,6 @@
 using MediatR;
 using UserService.Application.DTOs;
+using UserService.Domain.Enums;
 
 namespace UserService.Application.Commands
 {
@@ -19,6 +20,11 @@ namespace UserService.Application.Commands
         public string? DealBreakers { get; set; }
         public string? Zodiac { get; set; }
         public string? LoveLanguage { get; set; }
+        
+        // New Vietnamese localization fields
+        public EmotionType? Emotion { get; set; }
+        public VoiceQualityType? VoiceQuality { get; set; }
+        public AccentType? Accent { get; set; }
         
         // Legacy fields for backward compatibility
         public string? Job { get; set; }
@@ -46,6 +52,11 @@ namespace UserService.Application.Commands
         public string? DealBreakers { get; set; }
         public string? Zodiac { get; set; }
         public string? LoveLanguage { get; set; }
+        
+        // New Vietnamese localization fields
+        public EmotionType? Emotion { get; set; }
+        public VoiceQualityType? VoiceQuality { get; set; }
+        public AccentType? Accent { get; set; }
         
         // Legacy fields for backward compatibility
         public string? Job { get; set; }

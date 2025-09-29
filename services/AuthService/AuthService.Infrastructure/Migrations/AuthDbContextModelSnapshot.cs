@@ -38,9 +38,6 @@ namespace AuthService.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("FailedLoginAttempts")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("IsEmailVerified")
                         .HasColumnType("boolean");
 
