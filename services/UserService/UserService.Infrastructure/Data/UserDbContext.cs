@@ -70,7 +70,22 @@ namespace UserService.Infrastructure.Data
                     .HasForeignKey<Profile>(p => p.UserId)
                     .OnDelete(DeleteBehavior.Cascade);
 
+                // Basic info fields
                 entity.Property(p => p.Bio).HasMaxLength(1000);
+                entity.Property(p => p.Voice).HasMaxLength(500); // URL to audio intro
+                entity.Property(p => p.University).HasMaxLength(200);
+                entity.Property(p => p.InterestedIn).HasMaxLength(500);
+                entity.Property(p => p.LookingFor).HasMaxLength(500);
+                entity.Property(p => p.StudyStyle).HasMaxLength(300);
+                entity.Property(p => p.WeekendHobby).HasMaxLength(300);
+                entity.Property(p => p.CampusLife).HasMaxLength(500);
+                entity.Property(p => p.FuturePlan).HasMaxLength(500);
+                entity.Property(p => p.CommunicationPreference).HasMaxLength(50);
+                entity.Property(p => p.DealBreakers).HasMaxLength(500);
+                entity.Property(p => p.Zodiac).HasMaxLength(50);
+                entity.Property(p => p.LoveLanguage).HasMaxLength(50);
+                
+                // Legacy fields for backward compatibility
                 entity.Property(p => p.Job).HasMaxLength(100);
                 entity.Property(p => p.School).HasMaxLength(100);
                 entity.Property(p => p.InterestedInGender).HasMaxLength(20);
