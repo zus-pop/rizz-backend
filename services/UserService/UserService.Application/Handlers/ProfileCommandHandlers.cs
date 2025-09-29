@@ -37,9 +37,47 @@ namespace UserService.Application.Handlers
 
             var profile = new DomainProfile(request.UserId);
             
+            // New fields
             if (!string.IsNullOrEmpty(request.Bio))
                 profile.SetBio(request.Bio);
             
+            if (!string.IsNullOrEmpty(request.Voice))
+                profile.SetVoice(request.Voice);
+                
+            if (!string.IsNullOrEmpty(request.University))
+                profile.SetUniversity(request.University);
+                
+            if (!string.IsNullOrEmpty(request.InterestedIn))
+                profile.SetInterestedIn(request.InterestedIn);
+                
+            if (!string.IsNullOrEmpty(request.LookingFor))
+                profile.SetLookingFor(request.LookingFor);
+                
+            if (!string.IsNullOrEmpty(request.StudyStyle))
+                profile.SetStudyStyle(request.StudyStyle);
+                
+            if (!string.IsNullOrEmpty(request.WeekendHobby))
+                profile.SetWeekendHobby(request.WeekendHobby);
+                
+            if (!string.IsNullOrEmpty(request.CampusLife))
+                profile.SetCampusLife(request.CampusLife);
+                
+            if (!string.IsNullOrEmpty(request.FuturePlan))
+                profile.SetFuturePlan(request.FuturePlan);
+                
+            if (!string.IsNullOrEmpty(request.CommunicationPreference))
+                profile.SetCommunicationPreference(request.CommunicationPreference);
+                
+            if (!string.IsNullOrEmpty(request.DealBreakers))
+                profile.SetDealBreakers(request.DealBreakers);
+                
+            if (!string.IsNullOrEmpty(request.Zodiac))
+                profile.SetZodiac(request.Zodiac);
+                
+            if (!string.IsNullOrEmpty(request.LoveLanguage))
+                profile.SetLoveLanguage(request.LoveLanguage);
+            
+            // Legacy fields for backward compatibility
             if (!string.IsNullOrEmpty(request.Job))
                 profile.SetJob(request.Job);
             
@@ -61,9 +99,47 @@ namespace UserService.Application.Handlers
             if (profile == null)
                 throw new ArgumentException("Profile not found");
 
+            // New fields
             if (request.Bio != null)
                 profile.SetBio(request.Bio);
+                
+            if (request.Voice != null)
+                profile.SetVoice(request.Voice);
+                
+            if (request.University != null)
+                profile.SetUniversity(request.University);
+                
+            if (request.InterestedIn != null)
+                profile.SetInterestedIn(request.InterestedIn);
+                
+            if (request.LookingFor != null)
+                profile.SetLookingFor(request.LookingFor);
+                
+            if (request.StudyStyle != null)
+                profile.SetStudyStyle(request.StudyStyle);
+                
+            if (request.WeekendHobby != null)
+                profile.SetWeekendHobby(request.WeekendHobby);
+                
+            if (request.CampusLife != null)
+                profile.SetCampusLife(request.CampusLife);
+                
+            if (request.FuturePlan != null)
+                profile.SetFuturePlan(request.FuturePlan);
+                
+            if (request.CommunicationPreference != null)
+                profile.SetCommunicationPreference(request.CommunicationPreference);
+                
+            if (request.DealBreakers != null)
+                profile.SetDealBreakers(request.DealBreakers);
+                
+            if (request.Zodiac != null)
+                profile.SetZodiac(request.Zodiac);
+                
+            if (request.LoveLanguage != null)
+                profile.SetLoveLanguage(request.LoveLanguage);
             
+            // Legacy fields for backward compatibility
             if (request.Job != null)
                 profile.SetJob(request.Job);
             
