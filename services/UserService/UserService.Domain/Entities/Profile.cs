@@ -18,20 +18,6 @@ namespace UserService.Domain.Entities
         public string? LoveLanguage { get; private set; }
         
         // Legacy fields for backward compatibility
-        public string? Voice { get; private set; } // URL to audio intro
-        public string? University { get; private set; }
-        public string? InterestedIn { get; private set; }
-        public string? LookingFor { get; private set; }
-        public string? StudyStyle { get; private set; }
-        public string? WeekendHobby { get; private set; }
-        public string? CampusLife { get; private set; }
-        public string? FuturePlan { get; private set; }
-        public string? CommunicationPreference { get; private set; }
-        public string? DealBreakers { get; private set; }
-        public string? Zodiac { get; private set; }
-        public string? LoveLanguage { get; private set; }
-        
-        // Legacy fields for backward compatibility
         public string? Job { get; private set; }
         public string? School { get; private set; }
         public int? InterestedInAgeMin { get; private set; }
