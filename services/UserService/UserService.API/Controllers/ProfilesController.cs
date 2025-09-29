@@ -171,6 +171,45 @@ namespace UserService.API.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+
+        [HttpGet("matches/{userId}")]
+        public async Task<IActionResult> GetProfileMatches(int userId, 
+            [FromQuery] double? latitude = null,
+            [FromQuery] double? longitude = null,
+            [FromQuery] int page = 1, 
+            [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                var query = new GetProfilesByPreferencesQuery
+                {
+                    UserId = userId,
+                    UserLatitude = latitude,
+                    UserLongitude = longitude,
+                    Page = page,
+                    PageSize = pageSize
+                };
+
+                var profiles = await _mediator.Send(query);
+
+                return Ok(new
+                {
+                    success = true,
+                    data = profiles,
+                    pagination = new
+                    {
+                        page = page,
+                        pageSize = pageSize,
+                        hasNext = profiles.Count() == pageSize
+                    },
+                    message = "Profile matches retrieved successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 
     public class CreateProfileRequest
