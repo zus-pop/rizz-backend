@@ -157,18 +157,39 @@ namespace AuthService.Application.Handlers
     {
         private readonly IJwtProvider _jwtProvider;
         private readonly ILogger<RefreshTokenCommandHandler> _logger;
+        private readonly IAuthUserRepository _userRepository;
 
-        public RefreshTokenCommandHandler(IJwtProvider jwtProvider, ILogger<RefreshTokenCommandHandler> logger)
+        public RefreshTokenCommandHandler(IJwtProvider jwtProvider, ILogger<RefreshTokenCommandHandler> logger, IAuthUserRepository userRepository)
         {
             _jwtProvider = jwtProvider;
             _logger = logger;
+            _userRepository = userRepository;
         }
 
         public async Task<string?> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                return await _jwtProvider.RefreshTokenAsync(request.Token, request.RefreshToken);
+                var newJwt = await _jwtProvider.RefreshTokenAsync(request.Token, request.RefreshToken);
+                if (newJwt == null) return null;
+
+                // Rotate refresh token: find user and issue a new refresh token
+                var principal = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler().ReadJwtToken(request.Token);
+                var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (int.TryParse(userIdClaim, out var userId))
+                {
+                    var user = await _userRepository.GetByIdAsync(userId);
+                    if (user != null && user.RefreshToken == request.RefreshToken && user.RefreshTokenExpiryTime > DateTime.UtcNow)
+                    {
+                        var newRefresh = _jwtProvider.GenerateRefreshToken();
+                        user.SetRefreshToken(newRefresh, DateTime.UtcNow.AddDays(30));
+                        await _userRepository.UpdateAsync(user);
+                        await _userRepository.SaveChangesAsync();
+                        // Return combined token in format 'access||refresh'
+                        return newJwt + "||" + newRefresh;
+                    }
+                }
+                return null;
             }
             catch (Exception ex)
             {

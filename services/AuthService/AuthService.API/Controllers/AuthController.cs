@@ -167,16 +167,24 @@ namespace AuthService.API.Controllers
             try
             {
                 var command = new RefreshTokenCommand(req.Token, req.RefreshToken);
-                var newToken = await _mediator.Send(command);
+                var combined = await _mediator.Send(command);
                 
-                if (newToken == null)
+                if (combined == null)
                 {
                     return Unauthorized(new { message = "Invalid refresh token" });
                 }
-
-                return Ok(new { 
-                    message = "Token refreshed successfully", 
-                    accessToken = newToken
+                string accessToken = combined;
+                string? newRefresh = null;
+                if (combined.Contains("||"))
+                {
+                    var parts = combined.Split("||", StringSplitOptions.RemoveEmptyEntries);
+                    accessToken = parts[0];
+                    newRefresh = parts.Length > 1 ? parts[1] : null;
+                }
+                return Ok(new {
+                    message = "Token refreshed successfully",
+                    accessToken,
+                    refreshToken = newRefresh // may be null if rotation not applied
                 });
             }
             catch (Exception ex)
@@ -186,6 +194,7 @@ namespace AuthService.API.Controllers
         }
 
         [HttpPost("revoke-token/{userId}")]
+        [Microsoft.AspNetCore.Authorization.Authorize]
         public async Task<IActionResult> RevokeToken(int userId)
         {
             try

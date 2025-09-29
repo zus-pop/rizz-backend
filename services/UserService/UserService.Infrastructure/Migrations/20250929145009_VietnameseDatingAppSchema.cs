@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace UserService.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class VietnameseDatingAppSchema : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -125,11 +125,14 @@ namespace UserService.Infrastructure.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
-                    AgeMin = table.Column<int>(type: "integer", nullable: true),
-                    AgeMax = table.Column<int>(type: "integer", nullable: true),
-                    InterestedInGender = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
-                    MaxDistanceKm = table.Column<double>(type: "double precision", nullable: true),
-                    ShowOnlyVerified = table.Column<bool>(type: "boolean", nullable: false),
+                    LookingForGender = table.Column<string>(type: "text", nullable: true),
+                    AgeRangeMin = table.Column<int>(type: "integer", nullable: true),
+                    AgeRangeMax = table.Column<int>(type: "integer", nullable: true),
+                    LocationRadiusKm = table.Column<int>(type: "integer", nullable: true),
+                    InterestsFilter = table.Column<string>(type: "jsonb", nullable: true),
+                    Emotion = table.Column<string>(type: "text", nullable: true),
+                    VoiceQuality = table.Column<string>(type: "text", nullable: true),
+                    Accent = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
@@ -152,13 +155,21 @@ namespace UserService.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     UserId = table.Column<int>(type: "integer", nullable: false),
                     Bio = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
-                    Job = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    School = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
-                    InterestedInAgeMin = table.Column<int>(type: "integer", nullable: true),
-                    InterestedInAgeMax = table.Column<int>(type: "integer", nullable: true),
-                    InterestedInGender = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
-                    MaxDistanceKm = table.Column<double>(type: "double precision", nullable: true),
-                    ShowOnlyVerified = table.Column<bool>(type: "boolean", nullable: false),
+                    Voice = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Emotion = table.Column<string>(type: "text", nullable: true),
+                    VoiceQuality = table.Column<string>(type: "text", nullable: true),
+                    Accent = table.Column<string>(type: "text", nullable: true),
+                    University = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
+                    InterestedIn = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    LookingFor = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    StudyStyle = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
+                    WeekendHobby = table.Column<string>(type: "character varying(300)", maxLength: 300, nullable: true),
+                    CampusLife = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    FuturePlan = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    CommunicationPreference = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    DealBreakers = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Zodiac = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    LoveLanguage = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
