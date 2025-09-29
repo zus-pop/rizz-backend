@@ -57,6 +57,10 @@ for (int retry = 0; retry < 5; retry++)
         logger.LogInformation("Applying database migrations...");
         await context.Database.MigrateAsync();
         
+        // Seed sample data
+        logger.LogInformation("Seeding sample data...");
+        await SampleDataSeeder.SeedSampleDataAsync(context);
+        
         logger.LogInformation("UserService database migration completed successfully");
         break;
     }

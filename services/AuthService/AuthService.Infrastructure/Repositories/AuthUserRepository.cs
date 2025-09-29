@@ -13,9 +13,20 @@ public class AuthUserRepository : IAuthUserRepository
     public async Task<AuthUser?> GetByEmailAsync(string email)
         => await _context.AuthUsers.FirstOrDefaultAsync(u => u.Email == email);
 
+    public async Task<AuthUser?> GetByIdAsync(int id)
+        => await _context.AuthUsers.FirstOrDefaultAsync(u => u.Id == id);
+
+    public async Task<AuthUser?> GetByPhoneNumberAsync(string phoneNumber)
+        => await _context.AuthUsers.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+
     public async Task AddAsync(AuthUser user)
     {
         await _context.AuthUsers.AddAsync(user);
+    }
+
+    public async Task UpdateAsync(AuthUser user)
+    {
+        _context.AuthUsers.Update(user);
     }
 
     public async Task SaveChangesAsync()
