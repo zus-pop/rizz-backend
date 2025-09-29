@@ -32,6 +32,7 @@ namespace UserService.API.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProfileRepository, ProfileRepository>();
             services.AddScoped<IPhotoRepository, PhotoRepository>();
+            services.AddScoped<IPreferenceRepository, PreferenceRepository>();
 
             // Add MediatR
             services.AddMediatR(cfg => 

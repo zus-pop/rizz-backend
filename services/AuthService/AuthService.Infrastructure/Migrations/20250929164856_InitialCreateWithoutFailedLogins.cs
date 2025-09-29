@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AuthService.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreateWithoutFailedLogins : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,7 +27,6 @@ namespace AuthService.Infrastructure.Migrations
                     VerifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    FailedLoginAttempts = table.Column<int>(type: "integer", nullable: false),
                     LockoutEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     RefreshToken = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     RefreshTokenExpiryTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)

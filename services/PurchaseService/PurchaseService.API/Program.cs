@@ -4,9 +4,9 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Serilog
-builder.Host.UseSerilog((context, configuration) =>
-    configuration.ReadFrom.Configuration(context.Configuration));
+// Add Serilog - temporarily disable to test
+// builder.Host.UseSerilog((context, configuration) =>
+//     configuration.ReadFrom.Configuration(context.Configuration));
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -47,7 +47,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseSerilogRequestLogging();
+// app.UseSerilogRequestLogging();
 
 app.UseCors("AllowAll");
 
@@ -61,11 +61,14 @@ app.MapHealthChecks("/health");
 try
 {
     await app.Services.MigrateDatabaseAsync();
+    Console.WriteLine("PurchaseService database migration completed successfully");
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "An error occurred while migrating the database");
-    return;
+    Console.WriteLine($"FATAL: An error occurred while migrating the database: {ex.Message}");
+    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+    throw;
 }
 
+Console.WriteLine("Starting PurchaseService...");
 app.Run();
