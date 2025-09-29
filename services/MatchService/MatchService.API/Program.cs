@@ -3,6 +3,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MatchService.Application;
 using MatchService.Infrastructure;
 using MatchService.Infrastructure.Data;
+using MatchService.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,9 @@ builder.Services.AddSwaggerGen(c =>
 // Configure Clean Architecture layers
 builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
+
+// Add RabbitMQ Service
+builder.Services.AddSingleton<RabbitMqService>();
 
 // Add CORS
 builder.Services.AddCors(options =>

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MatchService.Infrastructure.Data;
 using MatchService.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using MatchService.API.Services;
 
 namespace MatchService.API.Controllers
 {
@@ -10,10 +11,12 @@ namespace MatchService.API.Controllers
     public class MatchesController : ControllerBase
     {
         private readonly MatchDbContext _context;
+        private readonly RabbitMqService _rabbitMqService;
 
-        public MatchesController(MatchDbContext context)
+        public MatchesController(MatchDbContext context, RabbitMqService rabbitMqService)
         {
             _context = context;
+            _rabbitMqService = rabbitMqService;
         }
 
         /// <summary>
@@ -56,6 +59,17 @@ namespace MatchService.API.Controllers
         [HttpPost("swipe")]
         public async Task<ActionResult> CreateSwipe([FromBody] CreateSwipeRequest request)
         {
+            // Validate input
+            if (request.SwiperId == request.TargetUserId)
+                return BadRequest(new { message = "Cannot swipe on yourself" });
+
+            // Check for duplicate swipe
+            var existingSwipe = await _context.Swipes
+                .FirstOrDefaultAsync(s => s.SwiperId == request.SwiperId && s.TargetUserId == request.TargetUserId);
+
+            if (existingSwipe != null)
+                return Conflict(new { message = "You have already swiped on this user" });
+
             var swipe = new Swipe
             {
                 SwiperId = request.SwiperId,
@@ -65,6 +79,7 @@ namespace MatchService.API.Controllers
 
             _context.Swipes.Add(swipe);
 
+            Match? newMatch = null;
             // Check if this creates a match (both users liked each other)
             if (swipe.IsLike())
             {
@@ -75,18 +90,50 @@ namespace MatchService.API.Controllers
 
                 if (reciprocalSwipe != null)
                 {
-                    // Create a match
-                    var match = new Match
+                    // Check if match already exists
+                    var existingMatch = await _context.Matches
+                        .FirstOrDefaultAsync(m => (m.User1Id == request.SwiperId && m.User2Id == request.TargetUserId) ||
+                                                  (m.User1Id == request.TargetUserId && m.User2Id == request.SwiperId));
+
+                    if (existingMatch == null)
                     {
-                        User1Id = request.SwiperId,
-                        User2Id = request.TargetUserId
-                    };
-                    _context.Matches.Add(match);
+                        // Create a match
+                        newMatch = new Match
+                        {
+                            User1Id = request.SwiperId,
+                            User2Id = request.TargetUserId
+                        };
+                        _context.Matches.Add(newMatch);
+                    }
                 }
             }
 
             await _context.SaveChangesAsync();
-            return Ok(new { message = "Swipe recorded successfully", swipeId = swipe.Id });
+
+            // Publish MatchCreated event if a new match was created
+            if (newMatch != null)
+            {
+                var matchEvent = new
+                {
+                    MatchId = newMatch.Id,
+                    User1Id = newMatch.User1Id,
+                    User2Id = newMatch.User2Id,
+                    MatchedAt = newMatch.MatchedAt,
+                    EventType = "MatchCreated"
+                };
+
+                await _rabbitMqService.PublishAsync("match.events", matchEvent);
+            }
+
+            var response = new
+            {
+                message = "Swipe recorded successfully",
+                swipeId = swipe.Id,
+                matchCreated = newMatch != null,
+                matchId = newMatch?.Id
+            };
+
+            return Ok(response);
         }
 
         /// <summary>

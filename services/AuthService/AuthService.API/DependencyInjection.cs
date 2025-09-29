@@ -26,6 +26,7 @@ public static class DependencyInjection
         // Service registrations
         services.AddScoped<IJwtProvider, JwtProvider>();
         services.AddScoped<IOtpService, OtpService>();
+        services.AddScoped<IEmailService, EmailService>();
         
         // MediatR registration
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(RegisterUserCommandHandler).Assembly));
