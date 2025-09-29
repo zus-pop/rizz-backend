@@ -4,6 +4,20 @@ namespace UserService.Domain.Entities
     {
         public int UserId { get; private set; }
         public string? Bio { get; private set; }
+        public string? Voice { get; private set; } // URL to audio intro
+        public string? University { get; private set; }
+        public string? InterestedIn { get; private set; }
+        public string? LookingFor { get; private set; }
+        public string? StudyStyle { get; private set; }
+        public string? WeekendHobby { get; private set; }
+        public string? CampusLife { get; private set; }
+        public string? FuturePlan { get; private set; }
+        public string? CommunicationPreference { get; private set; }
+        public string? DealBreakers { get; private set; }
+        public string? Zodiac { get; private set; }
+        public string? LoveLanguage { get; private set; }
+        
+        // Legacy fields for backward compatibility
         public string? Job { get; private set; }
         public string? School { get; private set; }
         public int? InterestedInAgeMin { get; private set; }
@@ -83,6 +97,117 @@ namespace UserService.Domain.Entities
         public void SetShowOnlyVerified(bool showOnlyVerified)
         {
             ShowOnlyVerified = showOnlyVerified;
+            SetUpdatedAt();
+        }
+
+        // New field setters
+        public void SetVoice(string? voice)
+        {
+            Voice = voice?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetUniversity(string? university)
+        {
+            University = university?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetInterestedIn(string? interestedIn)
+        {
+            InterestedIn = interestedIn?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetLookingFor(string? lookingFor)
+        {
+            LookingFor = lookingFor?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetStudyStyle(string? studyStyle)
+        {
+            StudyStyle = studyStyle?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetWeekendHobby(string? weekendHobby)
+        {
+            WeekendHobby = weekendHobby?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetCampusLife(string? campusLife)
+        {
+            CampusLife = campusLife?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetFuturePlan(string? futurePlan)
+        {
+            FuturePlan = futurePlan?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetCommunicationPreference(string? communicationPreference)
+        {
+            if (!string.IsNullOrEmpty(communicationPreference))
+            {
+                var validPreferences = new[] { "texting", "calling", "video_calls", "in_person", "social_media" };
+                if (!validPreferences.Contains(communicationPreference.ToLower()))
+                    throw new ArgumentException("Invalid communication preference", nameof(communicationPreference));
+                
+                CommunicationPreference = communicationPreference.ToLower();
+            }
+            else
+            {
+                CommunicationPreference = null;
+            }
+            
+            SetUpdatedAt();
+        }
+
+        public void SetDealBreakers(string? dealBreakers)
+        {
+            DealBreakers = dealBreakers?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetZodiac(string? zodiac)
+        {
+            if (!string.IsNullOrEmpty(zodiac))
+            {
+                var validSigns = new[] { "aries", "taurus", "gemini", "cancer", "leo", "virgo", 
+                                       "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces" };
+                if (!validSigns.Contains(zodiac.ToLower()))
+                    throw new ArgumentException("Invalid zodiac sign", nameof(zodiac));
+                
+                Zodiac = zodiac.ToLower();
+            }
+            else
+            {
+                Zodiac = null;
+            }
+            
+            SetUpdatedAt();
+        }
+
+        public void SetLoveLanguage(string? loveLanguage)
+        {
+            if (!string.IsNullOrEmpty(loveLanguage))
+            {
+                var validLanguages = new[] { "words_of_affirmation", "acts_of_service", "receiving_gifts", 
+                                           "quality_time", "physical_touch" };
+                if (!validLanguages.Contains(loveLanguage.ToLower()))
+                    throw new ArgumentException("Invalid love language", nameof(loveLanguage));
+                
+                LoveLanguage = loveLanguage.ToLower();
+            }
+            else
+            {
+                LoveLanguage = null;
+            }
+            
             SetUpdatedAt();
         }
     }
