@@ -15,9 +15,20 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddAuthService(this IServiceCollection services, IConfiguration config)
     {
-        services.AddDbContext<AuthDbContext>(options =>
-            options.UseNpgsql(config.GetConnectionString("DefaultConnection"), 
-                b => b.MigrationsAssembly("AuthService.Infrastructure")));
+        // Explicitly get connection string with fallback
+        var connectionString = config.GetConnectionString("Postgres") 
+            ?? Environment.GetEnvironmentVariable("ConnectionStrings__Postgres")
+            ?? "Host=localhost;Port=5432;Database=auth_db;Username=postgres;Password=123456";
+            
+        Console.WriteLine($"[AuthService] Using connection string: {connectionString}");
+            
+        services.AddDbContext<AuthDbContext>(options => {
+            options.UseNpgsql(connectionString, 
+                b => b.MigrationsAssembly("AuthService.Infrastructure"));
+            // // Add logging for database operations
+            // options.EnableSensitiveDataLogging();
+            // options.LogTo(Console.WriteLine);
+        });
         
         // Repository registrations
         services.AddScoped<IAuthUserRepository, AuthUserRepository>();
