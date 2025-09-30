@@ -5,6 +5,8 @@ using PushService.Infrastructure.Data;
 using PushService.Domain.Repositories;
 using PushService.Infrastructure.Repositories;
 using PushService.Infrastructure.Services;
+using PushService.Infrastructure;
+using PushService.Application;
 using PushService.Application.Services;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -60,6 +62,8 @@ builder.Services.AddDbContext<PushDbContext>(options =>
 
 // Repository registration
 builder.Services.AddScoped<IDeviceTokenRepository, DeviceTokenRepository>();
+
+// Service registration  
 builder.Services.AddScoped<IPushNotificationService, FirebasePushNotificationService>();
 
 // MediatR registration

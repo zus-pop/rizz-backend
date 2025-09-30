@@ -1,4 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using System.Text;
+using System.Text.Json;
 using NotificationService.Application.Interfaces;
 using NotificationService.Domain.Entities;
 using NotificationService.Domain.ValueObjects;
@@ -194,29 +197,86 @@ public class SmsService : ISmsService
 
 public class PushNotificationService : IPushNotificationService
 {
+    private readonly HttpClient _httpClient;
     private readonly ILogger<PushNotificationService> _logger;
+    private readonly IConfiguration _configuration;
 
-    public PushNotificationService(ILogger<PushNotificationService> logger)
+    public PushNotificationService(
+        HttpClient httpClient,
+        ILogger<PushNotificationService> logger,
+        IConfiguration configuration)
     {
+        _httpClient = httpClient;
         _logger = logger;
+        _configuration = configuration;
+        
+        // Configure HttpClient for PushService
+        var pushServiceUrl = _configuration["Services:PushService:BaseUrl"] ?? "http://pushservice:8080";
+        _httpClient.BaseAddress = new Uri(pushServiceUrl);
+        _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
     }
 
     public async Task<bool> SendPushNotificationAsync(string userId, string title, string body, Dictionary<string, string> data, CancellationToken cancellationToken = default)
     {
-        // Implementation would integrate with push service (Firebase, Azure Notification Hubs, etc.)
-        _logger.LogInformation("Sending push notification to user {UserId} with title: {Title}", userId, title);
-        
-        // Simulate async push notification sending
-        await Task.Delay(200, cancellationToken);
-        
-        // For now, return true (mock implementation)
-        return true;
+        try
+        {
+            var requestPayload = new
+            {
+                UserId = int.Parse(userId),
+                Notification = new
+                {
+                    Title = title,
+                    Body = body,
+                    Data = data ?? new Dictionary<string, string>()
+                }
+            };
+
+            var json = JsonSerializer.Serialize(requestPayload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync("/api/notifications/send-to-user/" + userId, content, cancellationToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Successfully sent push notification to user {UserId}", userId);
+                return true;
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogWarning("Failed to send push notification to user {UserId}. Status: {StatusCode}, Error: {Error}", 
+                    userId, response.StatusCode, errorContent);
+                return false;
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "HTTP error when sending push notification to user {UserId}", userId);
+            return false;
+        }
+        catch (TaskCanceledException ex)
+        {
+            _logger.LogWarning(ex, "Timeout when sending push notification to user {UserId}", userId);
+            return false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Unexpected error when sending push notification to user {UserId}", userId);
+            return false;
+        }
     }
 
     public async Task<bool> IsAvailableAsync(CancellationToken cancellationToken = default)
     {
-        // Check if push notification service is available
-        await Task.CompletedTask;
-        return true;
+        try
+        {
+            var response = await _httpClient.GetAsync("/health", cancellationToken);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "PushService health check failed");
+            return false;
+        }
     }
 }
