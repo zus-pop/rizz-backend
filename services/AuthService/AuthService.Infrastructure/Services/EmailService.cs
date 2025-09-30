@@ -23,8 +23,18 @@ namespace AuthService.Infrastructure.Services
             {
                 var smtpSettings = _configuration.GetSection("Smtp");
                 var host = smtpSettings["Host"];
-                var port = int.Parse(smtpSettings["Port"] ?? "587");
-                var enableSsl = bool.Parse(smtpSettings["EnableSsl"] ?? "true");
+                int port;
+                if (!int.TryParse(smtpSettings["Port"], out port))
+                {
+                    port = 587;
+                    _logger.LogWarning("Invalid SMTP port configuration value '{PortValue}'. Using default port 587.", smtpSettings["Port"]);
+                }
+                bool enableSsl;
+                if (!bool.TryParse(smtpSettings["EnableSsl"], out enableSsl))
+                {
+                    enableSsl = true;
+                    _logger.LogWarning("Invalid SMTP EnableSsl configuration value '{EnableSslValue}'. Using default value 'true'.", smtpSettings["EnableSsl"]);
+                }
                 var username = smtpSettings["Username"];
                 var password = smtpSettings["Password"];
                 var fromEmail = smtpSettings["FromEmail"] ?? username;
