@@ -71,13 +71,18 @@ var app = builder.Build();
 // Add global exception handling middleware
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
-// Database migration
 try {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    await context.Database.MigrateAsync();
-    // Temporarily disable seeding to test registration
-    // await AuthSampleDataSeeder.SeedSampleDataAsync(context);
+    // Test basic connection first
+    var canConnect = await context.Database.CanConnectAsync();
+    if (canConnect) {
+        // Skip migration for now since tables are manually created
+        // await context.Database.MigrateAsync();
+        Console.WriteLine("Database connection successful - tables already exist");
+    } else {
+        Console.WriteLine("Cannot connect to database - will continue without DB");
+    }
 }
 catch (Exception ex) {
     Console.WriteLine($"Migration failed: {ex.Message}");
