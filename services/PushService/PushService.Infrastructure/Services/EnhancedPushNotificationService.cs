@@ -24,22 +24,12 @@ public class EnhancedPushNotificationService : IEnhancedPushNotificationService
 
     public EnhancedPushNotificationService(
         IMediator mediator,
-        ILogger<EnhancedPushNotificationService> logger)
+        ILogger<EnhancedPushNotificationService> logger,
+        FirebaseMessaging firebaseMessaging)
     {
         _mediator = mediator;
         _logger = logger;
-        
-        // Initialize Firebase if not already done
-        if (FirebaseApp.DefaultInstance == null)
-        {
-            FirebaseApp.Create(new AppOptions()
-            {
-                Credential = GoogleCredential.GetApplicationDefault(),
-                ProjectId = Environment.GetEnvironmentVariable("FIREBASE_PROJECT_ID")
-            });
-        }
-        
-        _firebaseMessaging = FirebaseMessaging.DefaultInstance;
+        _firebaseMessaging = firebaseMessaging;
     }
 
     public async Task<PushNotificationResult> SendToUserAsync(int userId, PushNotificationDto notification, CancellationToken cancellationToken = default)
