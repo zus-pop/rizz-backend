@@ -193,12 +193,15 @@ public class EnhancedPushNotificationService : IEnhancedPushNotificationService
         }
     }
 
-    private async Task HandleFailedToken(int deviceTokenId, string? error, CancellationToken cancellationToken)
+    private async Task HandleFailedToken(int deviceTokenId, Exception? exception, CancellationToken cancellationToken)
     {
         try
         {
             // If the token is invalid, deactivate it
-            if (error != null && (error.Contains("Invalid") || error.Contains("unregistered") || error.Contains("not found")))
+            if (exception is FirebaseMessagingException fcmEx &&
+                (fcmEx.ErrorCode == ErrorCode.Unregistered ||
+                 fcmEx.ErrorCode == ErrorCode.InvalidRegistration ||
+                 fcmEx.ErrorCode == ErrorCode.NotFound))
             {
                 var deactivateCommand = new DeactivateDeviceTokenCommand { Id = deviceTokenId };
                 await _mediator.Send(deactivateCommand, cancellationToken);
