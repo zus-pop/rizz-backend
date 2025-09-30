@@ -80,12 +80,16 @@ try {
         // Skip migration for now since tables are manually created
         // await context.Database.MigrateAsync();
         Console.WriteLine("Database connection successful - tables already exist");
+        
+        // Seed sample data with proper BCrypt hashes
+        await AuthSampleDataSeeder.SeedSampleDataAsync(context);
+        Console.WriteLine("Sample data seeded successfully");
     } else {
         Console.WriteLine("Cannot connect to database - will continue without DB");
     }
 }
 catch (Exception ex) {
-    Console.WriteLine($"Migration failed: {ex.Message}");
+    Console.WriteLine($"Database setup failed: {ex.Message}");
 }
 
 if (app.Environment.IsDevelopment()) {

@@ -91,7 +91,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddHealthChecks()
     .AddCheck("gateway_health", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy("Gateway is running"))
     .AddUrlGroup(new Uri("http://aiinsights:8080/health"), "aiinsights")
-    .AddUrlGroup(new Uri("http://authservice:8081/health"), "authservice")
+    .AddUrlGroup(new Uri("http://authservice:8080/health"), "authservice")
     .AddUrlGroup(new Uri("http://matchservice:8080/health"), "matchservice")
     .AddUrlGroup(new Uri("http://messagingservice:8080/health"), "messagingservice")
     .AddUrlGroup(new Uri("http://moderationservice:8080/health"), "moderationservice")
