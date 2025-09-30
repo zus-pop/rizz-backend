@@ -220,9 +220,15 @@ public class PushNotificationService : IPushNotificationService
     {
         try
         {
+            if (!int.TryParse(userId, out int parsedUserId))
+            {
+                _logger.LogWarning("Invalid userId '{UserId}' provided to SendPushNotificationAsync. Must be a valid integer.", userId);
+                return false;
+            }
+
             var requestPayload = new
             {
-                UserId = int.Parse(userId),
+                UserId = parsedUserId,
                 Notification = new
                 {
                     Title = title,
