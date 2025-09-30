@@ -8,7 +8,6 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         // Add Application services
-        services.AddScoped<IDeviceTokenService, DeviceTokenService>();
         
         return services;
     }
