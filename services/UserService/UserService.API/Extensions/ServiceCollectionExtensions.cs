@@ -16,7 +16,7 @@ namespace UserService.API.Extensions
             // Add Database
             services.AddDbContext<UserDbContext>(options =>
             {
-                var connectionString = configuration.GetConnectionString("DefaultConnection");
+                var connectionString = configuration.GetConnectionString("Postgres");
                 options.UseNpgsql(connectionString, npgsqlOptions =>
                 {
                     npgsqlOptions.EnableRetryOnFailure(
