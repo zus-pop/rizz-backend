@@ -66,7 +66,7 @@ namespace MessagingService.API.EventHandlers
             try
             {
                 // Send read receipt via SignalR
-                await _hubContext.Clients.Group($"match_{notification.MessageId}")
+                await _hubContext.Clients.Group($"match_{notification.MatchId}")
                     .SendAsync("MessageRead", new
                     {
                         messageId = notification.MessageId,
