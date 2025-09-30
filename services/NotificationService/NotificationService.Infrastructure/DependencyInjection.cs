@@ -5,6 +5,7 @@ using NotificationService.Application.Interfaces;
 using NotificationService.Infrastructure.Data;
 using NotificationService.Infrastructure.Repositories;
 using NotificationService.Infrastructure.Services;
+using NotificationService.Infrastructure.Messaging;
 using RabbitMQ.Client;
 
 namespace NotificationService.Infrastructure;
@@ -27,7 +28,10 @@ public static class DependencyInjection
         services.AddScoped<INotificationDeliveryInfrastructure, NotificationDeliveryService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<ISmsService, SmsService>();
-        services.AddScoped<IPushNotificationService, PushNotificationService>();
+        
+        // Configure HttpClient for PushNotificationService
+        services.AddHttpClient<IPushNotificationService, PushNotificationService>();
+        
         services.AddScoped<NotificationService.Domain.Services.INotificationTemplateService, NotificationService.Domain.Services.NotificationTemplateService>();
 
         // Add Utility Services
@@ -51,6 +55,10 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IEventPublisher, RabbitMqEventPublisher>();
+        
+        // Add Event Consumer
+        services.AddScoped<IEventConsumer, RabbitMqEventConsumer>();
+        services.AddHostedService<EventConsumerBackgroundService>();
 
         return services;
     }
