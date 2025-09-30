@@ -5,6 +5,7 @@ using MediatR;
 using AuthService.Application.Commands;
 using AuthService.Application.Queries;
 using AuthService.API.Models;
+using BCrypt.Net;
 
 namespace AuthService.API.Controllers
 {
