@@ -1,5 +1,6 @@
 ﻿using AuthService.Infrastructure.Data;
 using AuthService.API;
+using AuthService.API.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -67,16 +68,28 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Database migration
+// Add global exception handling middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
+
 try {
     using var scope = app.Services.CreateScope();
     var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    await context.Database.MigrateAsync();
-    // Temporarily disable seeding to test registration
-    // await AuthSampleDataSeeder.SeedSampleDataAsync(context);
+    // Test basic connection first
+    var canConnect = await context.Database.CanConnectAsync();
+    if (canConnect) {
+        // Skip migration for now since tables are manually created
+        // await context.Database.MigrateAsync();
+        Console.WriteLine("Database connection successful - tables already exist");
+        
+        // Seed sample data with proper BCrypt hashes
+        await AuthSampleDataSeeder.SeedSampleDataAsync(context);
+        Console.WriteLine("Sample data seeded successfully");
+    } else {
+        Console.WriteLine("Cannot connect to database - will continue without DB");
+    }
 }
 catch (Exception ex) {
-    Console.WriteLine($"Migration failed: {ex.Message}");
+    Console.WriteLine($"Database setup failed: {ex.Message}");
 }
 
 if (app.Environment.IsDevelopment()) {

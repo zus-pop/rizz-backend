@@ -7,12 +7,14 @@ namespace AuthService.Infrastructure.Services
     public class OtpService : IOtpService
     {
         private readonly IOtpCodeRepository _otpRepository;
+        private readonly IEmailService _emailService;
         private readonly ILogger<OtpService> _logger;
         private readonly Random _random = new Random();
 
-        public OtpService(IOtpCodeRepository otpRepository, ILogger<OtpService> logger)
+        public OtpService(IOtpCodeRepository otpRepository, IEmailService emailService, ILogger<OtpService> logger)
         {
             _otpRepository = otpRepository;
+            _emailService = emailService;
             _logger = logger;
         }
 
@@ -53,18 +55,21 @@ namespace AuthService.Infrastructure.Services
         {
             try
             {
-                // In a real implementation, this would integrate with email service (SendGrid, AWS SES, etc.)
-                // For now, we'll just log it
-                _logger.LogInformation("Sending Email OTP to {Email}: {Code}", email, code);
-                
                 // Create and save OTP record
                 var otpCode = OtpCode.CreateForEmail(email, code, "email_verification", 10);
                 await _otpRepository.AddAsync(otpCode);
                 await _otpRepository.SaveChangesAsync();
                 
-                // TODO: Integrate with actual email service
-                // await _emailService.SendAsync(email, "Verification Code", $"Your verification code is: {code}");
+                // Send email using EmailService
+                var emailSent = await _emailService.SendOtpEmailAsync(email, code);
                 
+                if (!emailSent)
+                {
+                    _logger.LogWarning("Failed to send email OTP to {Email}", email);
+                    return false;
+                }
+
+                _logger.LogInformation("Email OTP sent successfully to {Email}", email);
                 return true;
             }
             catch (Exception ex)

@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using UserService.Application.Commands;
 using UserService.Application.DTOs;
 using UserService.Application.Queries;
@@ -9,6 +10,7 @@ namespace UserService.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ProfilesController : ControllerBase
     {
         private readonly IMediator _mediator;
