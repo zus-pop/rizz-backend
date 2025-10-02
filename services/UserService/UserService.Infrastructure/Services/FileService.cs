@@ -106,17 +106,17 @@ namespace UserService.Infrastructure.Services
             await Task.CompletedTask;
         }
 
-        public async Task<bool> VoiceFileExistsAsync(int userId)
+        public Task<bool> VoiceFileExistsAsync(int userId)
         {
             var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "uploaded-voice", "users");
             
             if (!Directory.Exists(uploadDir))
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             var userFiles = Directory.GetFiles(uploadDir, $"user_{userId}_*");
-            return await Task.FromResult(userFiles.Any());
+            return Task.FromResult(userFiles.Any());
         }
 
         private static string GetContentType(string fileName)
