@@ -30,35 +30,15 @@ namespace UserService.Infrastructure.Repositories
         public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             var normalizedEmail = email.ToLower().Trim();
-            
-            // Use completely raw SQL with direct connection to avoid Value Object conversion
-            var connection = _context.Database.GetDbConnection();
-            var shouldCloseConnection = connection.State == System.Data.ConnectionState.Closed;
-            
-            if (shouldCloseConnection)
-                await connection.OpenAsync(cancellationToken);
-            
-            try
-            {
-                using var command = connection.CreateCommand();
-                command.CommandText = "SELECT \"Id\" FROM \"Users\" WHERE LOWER(\"Email\") = LOWER(@email)";
-                var emailParam = command.CreateParameter();
-                emailParam.ParameterName = "@email";
-                emailParam.Value = normalizedEmail;
-                command.Parameters.Add(emailParam);
-                
-                var result = await command.ExecuteScalarAsync(cancellationToken);
-                if (result == null)
-                    return null;
-                    
-                var userId = Convert.ToInt32(result);
-                return await GetByIdAsync(userId, cancellationToken);
-            }
-            finally
-            {
-                if (shouldCloseConnection)
-                    connection.Close();
-            }
+
+            // Use EF Core LINQ query with value converter for Email value object
+            return await _context.Users
+                .Include(u => u.Profile)
+                .Include(u => u.Preference)
+                .Include(u => u.Photos)
+                .Include(u => u.DeviceTokens)
+                .Include(u => u.AIInsight)
+                .FirstOrDefaultAsync(u => u.Email.Value.ToLower() == normalizedEmail, cancellationToken);
         }
 
         public async Task<User?> GetByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken = default)
