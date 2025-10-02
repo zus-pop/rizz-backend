@@ -1,5 +1,3 @@
-using UserService.Domain.Enums;
-
 namespace UserService.Application.DTOs
 {
     public class ProfileDto
@@ -8,9 +6,9 @@ namespace UserService.Application.DTOs
         public int UserId { get; set; }
         public string? Bio { get; set; }
         public string? Voice { get; set; }
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
         public string? University { get; set; }
         public string? InterestedIn { get; set; }
         public string? LookingFor { get; set; }
@@ -30,9 +28,9 @@ namespace UserService.Application.DTOs
     {
         public string? Bio { get; set; }
         public string? Voice { get; set; }
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
         public string? University { get; set; }
         public string? InterestedIn { get; set; }
         public string? LookingFor { get; set; }
@@ -50,9 +48,9 @@ namespace UserService.Application.DTOs
     {
         public string? Bio { get; set; }
         public string? Voice { get; set; }
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
         public string? University { get; set; }
         public string? InterestedIn { get; set; }
         public string? LookingFor { get; set; }

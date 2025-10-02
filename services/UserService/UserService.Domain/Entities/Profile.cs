@@ -1,5 +1,3 @@
-using UserService.Domain.Enums;
-
 namespace UserService.Domain.Entities
 {
     public class Profile : BaseEntity
@@ -7,9 +5,9 @@ namespace UserService.Domain.Entities
         public int UserId { get; private set; }
         public string? Bio { get; private set; }
         public string? Voice { get; private set; } // URL to audio intro
-        public EmotionType? Emotion { get; private set; }
-        public VoiceQualityType? VoiceQuality { get; private set; }
-        public AccentType? Accent { get; private set; }
+        public string? Emotion { get; private set; }
+        public string? VoiceQuality { get; private set; }
+        public string? Accent { get; private set; }
         public string? University { get; private set; }
         public string? InterestedIn { get; private set; }
         public string? LookingFor { get; private set; }
@@ -41,21 +39,21 @@ namespace UserService.Domain.Entities
             SetUpdatedAt();
         }
 
-        public void SetEmotion(EmotionType? emotion)
+        public void SetEmotion(string? emotion)
         {
-            Emotion = emotion;
+            Emotion = emotion?.Trim();
             SetUpdatedAt();
         }
 
-        public void SetVoiceQuality(VoiceQualityType? voiceQuality)
+        public void SetVoiceQuality(string? voiceQuality)
         {
-            VoiceQuality = voiceQuality;
+            VoiceQuality = voiceQuality?.Trim();
             SetUpdatedAt();
         }
 
-        public void SetAccent(AccentType? accent)
+        public void SetAccent(string? accent)
         {
-            Accent = accent;
+            Accent = accent?.Trim();
             SetUpdatedAt();
         }
 

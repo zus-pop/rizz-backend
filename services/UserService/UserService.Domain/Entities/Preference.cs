@@ -11,9 +11,9 @@ namespace UserService.Domain.Entities
         public int? AgeRangeMax { get; private set; }
         public int? LocationRadiusKm { get; private set; }
         public string? InterestsFilter { get; private set; } // JSON string for interests
-        public EmotionType? Emotion { get; private set; }
-        public VoiceQualityType? VoiceQuality { get; private set; }
-        public AccentType? Accent { get; private set; }
+        public string? Emotion { get; private set; }
+        public string? VoiceQuality { get; private set; }
+        public string? Accent { get; private set; }
 
         private Preference() { } // For EF Core
 
@@ -66,21 +66,21 @@ namespace UserService.Domain.Entities
             SetUpdatedAt();
         }
 
-        public void SetEmotion(EmotionType? emotion)
+        public void SetEmotion(string? emotion)
         {
-            Emotion = emotion;
+            Emotion = emotion?.Trim();
             SetUpdatedAt();
         }
 
-        public void SetVoiceQuality(VoiceQualityType? voiceQuality)
+        public void SetVoiceQuality(string? voiceQuality)
         {
-            VoiceQuality = voiceQuality;
+            VoiceQuality = voiceQuality?.Trim();
             SetUpdatedAt();
         }
 
-        public void SetAccent(AccentType? accent)
+        public void SetAccent(string? accent)
         {
-            Accent = accent;
+            Accent = accent?.Trim();
             SetUpdatedAt();
         }
     }

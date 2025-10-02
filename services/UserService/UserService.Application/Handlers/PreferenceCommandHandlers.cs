@@ -37,14 +37,14 @@ namespace UserService.Application.Handlers
             if (!string.IsNullOrEmpty(request.InterestsFilter))
                 preference.SetInterestsFilter(request.InterestsFilter);
             
-            if (request.Emotion.HasValue)
-                preference.SetEmotion(request.Emotion.Value);
+            if (!string.IsNullOrEmpty(request.Emotion))
+                preference.SetEmotion(request.Emotion);
                 
-            if (request.VoiceQuality.HasValue)
-                preference.SetVoiceQuality(request.VoiceQuality.Value);
+            if (!string.IsNullOrEmpty(request.VoiceQuality))
+                preference.SetVoiceQuality(request.VoiceQuality);
                 
-            if (request.Accent.HasValue)
-                preference.SetAccent(request.Accent.Value);
+            if (!string.IsNullOrEmpty(request.Accent))
+                preference.SetAccent(request.Accent);
 
             var createdPreference = await _preferenceRepository.AddAsync(preference, cancellationToken);
             return _mapper.Map<PreferenceDto>(createdPreference);
@@ -68,14 +68,14 @@ namespace UserService.Application.Handlers
             if (request.InterestsFilter != null)
                 preference.SetInterestsFilter(request.InterestsFilter);
             
-            if (request.Emotion.HasValue)
-                preference.SetEmotion(request.Emotion.Value);
+            if (!string.IsNullOrEmpty(request.Emotion))
+                preference.SetEmotion(request.Emotion);
                 
-            if (request.VoiceQuality.HasValue)
-                preference.SetVoiceQuality(request.VoiceQuality.Value);
+            if (!string.IsNullOrEmpty(request.VoiceQuality))
+                preference.SetVoiceQuality(request.VoiceQuality);
                 
-            if (request.Accent.HasValue)
-                preference.SetAccent(request.Accent.Value);
+            if (!string.IsNullOrEmpty(request.Accent))
+                preference.SetAccent(request.Accent);
 
             await _preferenceRepository.UpdateAsync(preference, cancellationToken);
             return _mapper.Map<PreferenceDto>(preference);

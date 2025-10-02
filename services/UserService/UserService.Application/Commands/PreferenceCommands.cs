@@ -12,9 +12,9 @@ namespace UserService.Application.Commands
         public int? AgeMax { get; set; }
         public double? MaxDistanceKm { get; set; }
         public string? InterestsFilter { get; set; } // JSON string
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
     }
 
     public class UpdatePreferenceCommand : IRequest<PreferenceDto>
@@ -25,9 +25,9 @@ namespace UserService.Application.Commands
         public int? AgeMax { get; set; }
         public double? MaxDistanceKm { get; set; }
         public string? InterestsFilter { get; set; } // JSON string
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
     }
 
     public class DeletePreferenceCommand : IRequest<bool>
