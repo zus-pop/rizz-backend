@@ -25,13 +25,15 @@ namespace MessagingService.Domain.Events
     public class MessageReadEvent : IDomainEvent
     {
         public int MessageId { get; }
+        public int MatchId { get; }
         public int ReadById { get; }
         public DateTime ReadAt { get; }
         public DateTime OccurredOn { get; }
 
-        public MessageReadEvent(int messageId, int readById, DateTime readAt)
+        public MessageReadEvent(int messageId, int matchId, int readById, DateTime readAt)
         {
             MessageId = messageId;
+            MatchId = matchId;
             ReadById = readById;
             ReadAt = readAt;
             OccurredOn = DateTime.UtcNow;

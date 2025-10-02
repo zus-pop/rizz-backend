@@ -81,7 +81,7 @@ namespace MessagingService.Application.Commands
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Publish domain event
-            var domainEvent = new MessageReadEvent(message.Id, request.ReaderId, message.ReadAt.Value);
+            var domainEvent = new MessageReadEvent(message.Id, message.MatchId, request.ReaderId, message.ReadAt.Value);
             await _mediator.Publish(domainEvent, cancellationToken);
 
             return _mapper.Map<MessageDto>(message);

@@ -24,7 +24,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, i
         var user = new AuthUser
         {
             Email = request.Email,
-            PhoneNumber = request.PhoneNumber ?? string.Empty,
+            PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
             IsVerified = false,
             IsEmailVerified = false,

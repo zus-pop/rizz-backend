@@ -28,10 +28,6 @@ public static class DependencyInjection
         // Add Repositories
         services.AddScoped<IDeviceTokenRepository, DeviceTokenRepository>();
 
-        // Add Application Services
-        services.AddScoped<IDeviceTokenService, DeviceTokenService>();
-        services.AddScoped<IPushNotificationService, PushNotificationService>();
-        
         // Add Enhanced Services
         services.AddScoped<IEnhancedPushNotificationService, EnhancedPushNotificationService>();
         

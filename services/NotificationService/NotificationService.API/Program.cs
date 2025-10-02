@@ -100,9 +100,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "NotificationService API terminated unexpectedly: {ErrorMessage}", ex.Message);
-    Console.WriteLine($"Detailed error: {ex}");
-    throw;
+    Log.Fatal(ex, "NotificationService API terminated unexpectedly");
 }
 finally
 {

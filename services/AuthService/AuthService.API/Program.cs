@@ -2,6 +2,9 @@
 using AuthService.API;
 using AuthService.API.Middleware;
 using Microsoft.EntityFrameworkCore;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using System.IO;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,6 +93,43 @@ try {
 }
 catch (Exception ex) {
     Console.WriteLine($"Database setup failed: {ex.Message}");
+}
+
+// Firebase initialization
+try {
+    var firebaseConfig = builder.Configuration.GetSection("Firebase");
+    var firebaseProjectId = firebaseConfig["ProjectId"];
+    
+    if (!string.IsNullOrEmpty(firebaseProjectId)) {
+        if (FirebaseApp.DefaultInstance == null) {
+            GoogleCredential credential;
+            
+            // Try credentials JSON first, then file path, then default
+            var credentialsJson = firebaseConfig["CredentialsJson"];
+            var credentialsPath = firebaseConfig["CredentialsPath"];
+            
+            if (!string.IsNullOrEmpty(credentialsJson)) {
+                credential = GoogleCredential.FromJson(credentialsJson);
+                Console.WriteLine("Firebase initialized with JSON credentials");
+            } else if (!string.IsNullOrEmpty(credentialsPath) && File.Exists(credentialsPath)) {
+                credential = GoogleCredential.FromFile(credentialsPath);
+                Console.WriteLine($"Firebase initialized with credentials file: {credentialsPath}");
+            } else {
+                credential = GoogleCredential.GetApplicationDefault();
+                Console.WriteLine("Firebase initialized with application default credentials");
+            }
+            
+            FirebaseApp.Create(new AppOptions() {
+                Credential = credential,
+                ProjectId = firebaseProjectId
+            });
+            Console.WriteLine($"Firebase initialized successfully with project ID: {firebaseProjectId}");
+        }
+    } else {
+        Console.WriteLine("Warning: Firebase ProjectId not configured. Firebase authentication features will be limited.");
+    }
+} catch (Exception ex) {
+    Console.WriteLine($"Firebase initialization warning: {ex.Message}");
 }
 
 if (app.Environment.IsDevelopment()) {

@@ -66,7 +66,10 @@ public class EnhancedPushNotificationService : IEnhancedPushNotificationService
             var failedTokens = results.Where(r => !r.Success).ToList();
             foreach (var failedToken in failedTokens)
             {
-                await HandleFailedToken(failedToken.DeviceTokenId, failedToken.Error, cancellationToken);
+                var exception = !string.IsNullOrEmpty(failedToken.Error) 
+                    ? new Exception(failedToken.Error) 
+                    : null;
+                await HandleFailedToken(failedToken.DeviceTokenId, exception, cancellationToken);
             }
 
             var successCount = results.Count(r => r.Success);
@@ -133,7 +136,7 @@ public class EnhancedPushNotificationService : IEnhancedPushNotificationService
             _logger.LogDebug("Successfully sent message to token {Token}. Response: {Response}", 
                 MaskToken(token), response);
 
-            return PushNotificationResult.Success();
+            return PushNotificationResult.CreateSuccess();
         }
         catch (FirebaseMessagingException ex)
         {
@@ -141,15 +144,11 @@ public class EnhancedPushNotificationService : IEnhancedPushNotificationService
                 MaskToken(token), ex.ErrorCode, ex.Message);
 
             // Handle specific Firebase errors
-            return ex.ErrorCode switch
+            return ex.MessagingErrorCode switch
             {
-                ErrorCode.Unregistered or ErrorCode.InvalidRegistration => 
+                MessagingErrorCode.Unregistered or MessagingErrorCode.InvalidArgument => 
                     PushNotificationResult.Failed("Invalid or unregistered token", isTokenInvalid: true),
-                ErrorCode.NotFound => 
-                    PushNotificationResult.Failed("Token not found", isTokenInvalid: true),
-                ErrorCode.MessageRateExceeded => 
-                    PushNotificationResult.Failed("Rate limit exceeded", isRetryable: true),
-                ErrorCode.Unavailable => 
+                MessagingErrorCode.Unavailable => 
                     PushNotificationResult.Failed("Service unavailable", isRetryable: true),
                 _ => PushNotificationResult.Failed($"Firebase error: {ex.Message}")
             };
@@ -180,9 +179,8 @@ public class EnhancedPushNotificationService : IEnhancedPushNotificationService
             return true;
         }
         catch (FirebaseMessagingException ex) when (
-            ex.ErrorCode == ErrorCode.Unregistered || 
-            ex.ErrorCode == ErrorCode.InvalidRegistration ||
-            ex.ErrorCode == ErrorCode.NotFound)
+            ex.MessagingErrorCode == MessagingErrorCode.Unregistered || 
+            ex.MessagingErrorCode == MessagingErrorCode.InvalidArgument)
         {
             return false;
         }
@@ -199,9 +197,8 @@ public class EnhancedPushNotificationService : IEnhancedPushNotificationService
         {
             // If the token is invalid, deactivate it
             if (exception is FirebaseMessagingException fcmEx &&
-                (fcmEx.ErrorCode == ErrorCode.Unregistered ||
-                 fcmEx.ErrorCode == ErrorCode.InvalidRegistration ||
-                 fcmEx.ErrorCode == ErrorCode.NotFound))
+                (fcmEx.MessagingErrorCode == MessagingErrorCode.Unregistered ||
+                 fcmEx.MessagingErrorCode == MessagingErrorCode.InvalidArgument))
             {
                 var deactivateCommand = new DeactivateDeviceTokenCommand { Id = deviceTokenId };
                 await _mediator.Send(deactivateCommand, cancellationToken);
@@ -233,7 +230,7 @@ public class PushNotificationResult
     public bool IsRetryable { get; set; }
     public List<SingleTokenResult> TokenResults { get; set; } = new();
 
-    public static PushNotificationResult Success(string message = "Success")
+    public static PushNotificationResult CreateSuccess(string message = "Success")
     {
         return new PushNotificationResult { Success = true, Message = message };
     }

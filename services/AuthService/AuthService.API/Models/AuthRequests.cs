@@ -19,6 +19,15 @@ namespace AuthService.API.Models
     // Token validation request
     public record ValidateTokenRequest(string Token);
     
+    // Google authentication request
+    public record GoogleAuthRequest(string IdToken);
+    
+    // Firebase authentication request
+    public record FirebaseAuthRequest(string IdToken);
+    
+    // Firebase token verification request
+    public record VerifyFirebaseTokenRequest(string IdToken);
+    
     // Legacy requests for backward compatibility
     public record SendOtpRequest(string PhoneNumber);
     public record VerifyOtpRequest(string PhoneNumber, string Code);

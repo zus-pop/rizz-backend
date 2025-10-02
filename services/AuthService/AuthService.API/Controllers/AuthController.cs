@@ -167,6 +167,94 @@ namespace AuthService.API.Controllers
             }
         }
 
+        [HttpPost("google")]
+        [EnableRateLimiting("AuthPolicy")]
+        public async Task<IActionResult> GoogleAuth([FromBody] GoogleAuthRequest req)
+        {
+            try
+            {
+                var command = new GoogleAuthCommand(req.IdToken);
+                var result = await _mediator.Send(command);
+                
+                if (result == null)
+                {
+                    return Unauthorized(new { message = "Google authentication failed" });
+                }
+
+                return Ok(new { 
+                    message = "Google authentication successful", 
+                    accessToken = result.AccessToken,
+                    refreshToken = result.RefreshToken,
+                    userId = result.UserId,
+                    email = result.Email,
+                    isVerified = result.IsVerified
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Google authentication failed", error = ex.Message });
+            }
+        }
+
+        [HttpPost("firebase")]
+        [EnableRateLimiting("AuthPolicy")]
+        public async Task<IActionResult> FirebaseAuth([FromBody] FirebaseAuthRequest req)
+        {
+            try
+            {
+                var command = new FirebaseAuthCommand(req.IdToken);
+                var result = await _mediator.Send(command);
+                
+                if (result == null)
+                {
+                    return Unauthorized(new { message = "Firebase authentication failed" });
+                }
+
+                return Ok(new { 
+                    message = "Firebase authentication successful", 
+                    accessToken = result.AccessToken,
+                    refreshToken = result.RefreshToken,
+                    userId = result.UserId,
+                    email = result.Email,
+                    isVerified = result.IsVerified
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Firebase authentication failed", error = ex.Message });
+            }
+        }
+
+        [HttpPost("verify-firebase-token")]
+        [EnableRateLimiting("AuthPolicy")]
+        public async Task<IActionResult> VerifyFirebaseToken([FromBody] VerifyFirebaseTokenRequest req)
+        {
+            try
+            {
+                var command = new VerifyFirebaseTokenCommand(req.IdToken);
+                var result = await _mediator.Send(command);
+                
+                if (result == null)
+                {
+                    return Unauthorized(new { message = "Invalid Firebase token" });
+                }
+
+                return Ok(new { 
+                    message = "Firebase token verified successfully", 
+                    uid = result.Uid,
+                    email = result.Email,
+                    name = result.Name,
+                    picture = result.Picture,
+                    emailVerified = result.EmailVerified,
+                    claims = result.Claims
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Firebase token verification failed", error = ex.Message });
+            }
+        }
+
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest req)
         {

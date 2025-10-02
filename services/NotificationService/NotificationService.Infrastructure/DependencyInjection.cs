@@ -6,7 +6,7 @@ using NotificationService.Application.Interfaces;
 using NotificationService.Infrastructure.Data;
 using NotificationService.Infrastructure.Repositories;
 using NotificationService.Infrastructure.Services;
-using NotificationService.Infrastructure.Messaging;
+// using NotificationService.Infrastructure.Messaging;
 // using RabbitMQ.Client;
 
 namespace NotificationService.Infrastructure;
@@ -39,13 +39,8 @@ public static class DependencyInjection
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
-        // RabbitMQ Services - Using resilient implementations
-        services.AddScoped<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
-        services.AddScoped<IEventPublisher, RabbitMqEventPublisher>();
-        services.AddScoped<IEventConsumer, RabbitMqEventConsumer>();
-
-        // Background Services - Re-enabled with resilient connection handling
-        services.AddHostedService<EventConsumerBackgroundService>();
+        // Add Event Publisher - completely disabled for testing
+        services.AddScoped<IEventPublisher, NoOpEventPublisher>();
 
         return services;
     }
