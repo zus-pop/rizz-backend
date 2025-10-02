@@ -29,26 +29,71 @@ namespace UserService.Infrastructure.Repositories
 
         public async Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            var emailObj = Email.Create(email);
-            return await _context.Users
-                .Include(u => u.Profile)
-                .Include(u => u.Preference)
-                .Include(u => u.Photos)
-                .Include(u => u.DeviceTokens)
-                .Include(u => u.AIInsight)
-                .FirstOrDefaultAsync(u => u.Email.Value == emailObj.Value, cancellationToken);
+            var normalizedEmail = email.ToLower().Trim();
+            
+            // Use completely raw SQL with direct connection to avoid Value Object conversion
+            var connection = _context.Database.GetDbConnection();
+            var shouldCloseConnection = connection.State == System.Data.ConnectionState.Closed;
+            
+            if (shouldCloseConnection)
+                await connection.OpenAsync(cancellationToken);
+            
+            try
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT \"Id\" FROM \"Users\" WHERE LOWER(\"Email\") = LOWER(@email)";
+                var emailParam = command.CreateParameter();
+                emailParam.ParameterName = "@email";
+                emailParam.Value = normalizedEmail;
+                command.Parameters.Add(emailParam);
+                
+                var result = await command.ExecuteScalarAsync(cancellationToken);
+                if (result == null)
+                    return null;
+                    
+                var userId = Convert.ToInt32(result);
+                return await GetByIdAsync(userId, cancellationToken);
+            }
+            finally
+            {
+                if (shouldCloseConnection)
+                    connection.Close();
+            }
         }
 
         public async Task<User?> GetByPhoneNumberAsync(string phoneNumber, CancellationToken cancellationToken = default)
         {
-            var phoneObj = PhoneNumber.Create(phoneNumber);
-            return await _context.Users
-                .Include(u => u.Profile)
-                .Include(u => u.Preference)
-                .Include(u => u.Photos)
-                .Include(u => u.DeviceTokens)
-                .Include(u => u.AIInsight)
-                .FirstOrDefaultAsync(u => u.PhoneNumber.Value == phoneObj.Value, cancellationToken);
+            // Normalize the phone number using the same logic as PhoneNumber.Create
+            var normalizedPhone = phoneNumber.Trim().Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
+            
+            // Use completely raw SQL with direct connection to avoid Value Object conversion
+            var connection = _context.Database.GetDbConnection();
+            var shouldCloseConnection = connection.State == System.Data.ConnectionState.Closed;
+            
+            if (shouldCloseConnection)
+                await connection.OpenAsync(cancellationToken);
+            
+            try
+            {
+                using var command = connection.CreateCommand();
+                command.CommandText = "SELECT \"Id\" FROM \"Users\" WHERE \"PhoneNumber\" = @phone";
+                var phoneParam = command.CreateParameter();
+                phoneParam.ParameterName = "@phone";
+                phoneParam.Value = normalizedPhone;
+                command.Parameters.Add(phoneParam);
+                
+                var result = await command.ExecuteScalarAsync(cancellationToken);
+                if (result == null)
+                    return null;
+                    
+                var userId = Convert.ToInt32(result);
+                return await GetByIdAsync(userId, cancellationToken);
+            }
+            finally
+            {
+                if (shouldCloseConnection)
+                    connection.Close();
+            }
         }
 
         public async Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -128,28 +173,95 @@ namespace UserService.Infrastructure.Repositories
 
         public async Task<bool> EmailExistsAsync(string email, int? excludeUserId = null, CancellationToken cancellationToken = default)
         {
-            var emailObj = Email.Create(email);
-            var query = _context.Users.Where(u => u.Email.Value == emailObj.Value);
+            var normalizedEmail = email.ToLower().Trim();
             
-            if (excludeUserId.HasValue)
+            // Use completely raw SQL with direct connection to avoid Value Object conversion
+            var connection = _context.Database.GetDbConnection();
+            var shouldCloseConnection = connection.State == System.Data.ConnectionState.Closed;
+            
+            if (shouldCloseConnection)
+                await connection.OpenAsync(cancellationToken);
+            
+            try
             {
-                query = query.Where(u => u.Id != excludeUserId.Value);
+                using var command = connection.CreateCommand();
+                if (excludeUserId.HasValue)
+                {
+                    command.CommandText = "SELECT COUNT(1) FROM \"Users\" WHERE LOWER(\"Email\") = LOWER(@email) AND \"Id\" != @excludeId";
+                    var emailParam = command.CreateParameter();
+                    emailParam.ParameterName = "@email";
+                    emailParam.Value = normalizedEmail;
+                    command.Parameters.Add(emailParam);
+                    
+                    var excludeParam = command.CreateParameter();
+                    excludeParam.ParameterName = "@excludeId";
+                    excludeParam.Value = excludeUserId.Value;
+                    command.Parameters.Add(excludeParam);
+                }
+                else
+                {
+                    command.CommandText = "SELECT COUNT(1) FROM \"Users\" WHERE LOWER(\"Email\") = LOWER(@email)";
+                    var emailParam = command.CreateParameter();
+                    emailParam.ParameterName = "@email";
+                    emailParam.Value = normalizedEmail;
+                    command.Parameters.Add(emailParam);
+                }
+                
+                var result = await command.ExecuteScalarAsync(cancellationToken);
+                return Convert.ToInt32(result) > 0;
             }
-
-            return await query.AnyAsync(cancellationToken);
+            finally
+            {
+                if (shouldCloseConnection)
+                    connection.Close();
+            }
         }
 
         public async Task<bool> PhoneNumberExistsAsync(string phoneNumber, int? excludeUserId = null, CancellationToken cancellationToken = default)
         {
-            var phoneObj = PhoneNumber.Create(phoneNumber);
-            var query = _context.Users.Where(u => u.PhoneNumber.Value == phoneObj.Value);
+            // Normalize the phone number using the same logic as PhoneNumber.Create
+            var normalizedPhone = phoneNumber.Trim().Replace(" ", "").Replace("-", "").Replace("(", "").Replace(")", "");
             
-            if (excludeUserId.HasValue)
+            // Use completely raw SQL with direct connection to avoid Value Object conversion
+            var connection = _context.Database.GetDbConnection();
+            var shouldCloseConnection = connection.State == System.Data.ConnectionState.Closed;
+            
+            if (shouldCloseConnection)
+                await connection.OpenAsync(cancellationToken);
+            
+            try
             {
-                query = query.Where(u => u.Id != excludeUserId.Value);
+                using var command = connection.CreateCommand();
+                if (excludeUserId.HasValue)
+                {
+                    command.CommandText = "SELECT COUNT(1) FROM \"Users\" WHERE \"PhoneNumber\" = @phone AND \"Id\" != @excludeId";
+                    var phoneParam = command.CreateParameter();
+                    phoneParam.ParameterName = "@phone";
+                    phoneParam.Value = normalizedPhone;
+                    command.Parameters.Add(phoneParam);
+                    
+                    var excludeParam = command.CreateParameter();
+                    excludeParam.ParameterName = "@excludeId";
+                    excludeParam.Value = excludeUserId.Value;
+                    command.Parameters.Add(excludeParam);
+                }
+                else
+                {
+                    command.CommandText = "SELECT COUNT(1) FROM \"Users\" WHERE \"PhoneNumber\" = @phone";
+                    var phoneParam = command.CreateParameter();
+                    phoneParam.ParameterName = "@phone";
+                    phoneParam.Value = normalizedPhone;
+                    command.Parameters.Add(phoneParam);
+                }
+                
+                var result = await command.ExecuteScalarAsync(cancellationToken);
+                return Convert.ToInt32(result) > 0;
             }
-
-            return await query.AnyAsync(cancellationToken);
+            finally
+            {
+                if (shouldCloseConnection)
+                    connection.Close();
+            }
         }
     }
 }
