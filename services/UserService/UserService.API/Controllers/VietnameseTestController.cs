@@ -36,7 +36,7 @@ namespace UserService.API.Controllers
             try
             {
                 var users = await _context.Users
-                    .Where(u => u.Email.Value.Contains("vietnamese.test"))
+                    .Where(u => EF.Property<string>(u, "Email").Contains("vietnamese.test"))
                     .ToListAsync();
 
                 var profiles = await _context.Profiles

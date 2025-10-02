@@ -9,7 +9,7 @@ namespace UserService.Infrastructure.Data
         public static async Task SeedAsync(UserDbContext context)
         {
             // Check if we already have Vietnamese test data
-            if (await context.Users.AnyAsync(u => u.Email.Value.Contains("vietnamese.test")))
+            if (await context.Users.AnyAsync(u => EF.Property<string>(u, "Email").Contains("vietnamese.test")))
             {
                 return; // Already seeded
             }

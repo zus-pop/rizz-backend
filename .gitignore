@@ -457,3 +457,8 @@ scripts/**/*
 **/dev-*
 **/*.development.*
 **/*.temp.*
+
+# Voice Upload Files - Local storage for uploaded voice files
+# Ignore the entire uploaded-voice directory and all future contents
+uploaded-voice/
+uploaded-voice/**/*

@@ -45,7 +45,7 @@ public class NotificationMappingProfile : Profile
     {
         var notificationType = GetNotificationTypeFromString(dto.Type);
         var notificationPriority = GetNotificationPriorityFromString(dto.Priority);
-        var notificationContent = NotificationContent.Create(dto.Title, dto.Message);
+        var notificationContent = NotificationContent.Create(dto.Title, dto.Message, dto.Variables);
         
         var notification = new Notification(
             dto.UserId,
@@ -82,31 +82,12 @@ public class NotificationMappingProfile : Profile
 
     private static NotificationType GetNotificationTypeFromString(string type)
     {
-        return type.ToLower() switch
-        {
-            "match" => NotificationType.Match,
-            "message" => NotificationType.Message,
-            "like" => NotificationType.Like,
-            "superlike" => NotificationType.SuperLike,
-            "purchase" => NotificationType.Purchase,
-            "subscription" => NotificationType.Subscription,
-            "security" => NotificationType.Security,
-            "system" => NotificationType.System,
-            "promotion" => NotificationType.Promotion,
-            _ => NotificationType.System
-        };
+        return NotificationType.Create(type);
     }
 
     private static NotificationPriority GetNotificationPriorityFromString(string priority)
     {
-        return priority.ToLower() switch
-        {
-            "low" => NotificationPriority.Low,
-            "normal" => NotificationPriority.Normal,
-            "high" => NotificationPriority.High,
-            "urgent" => NotificationPriority.Urgent,
-            _ => NotificationPriority.Normal
-        };
+        return NotificationPriority.Create(priority);
     }
 
     private static DeliveryChannel GetDeliveryChannelFromString(string channel)

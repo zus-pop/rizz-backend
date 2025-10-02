@@ -81,12 +81,12 @@ namespace MatchService.API.Controllers
 
             Match? newMatch = null;
             // Check if this creates a match (both users liked each other)
-            if (swipe.IsLike())
+            if (swipe.Direction == Domain.Entities.SwipeDirection.Like || swipe.Direction == Domain.Entities.SwipeDirection.SuperLike)
             {
                 var reciprocalSwipe = await _context.Swipes
                     .FirstOrDefaultAsync(s => s.SwiperId == request.TargetUserId 
                                            && s.TargetUserId == request.SwiperId 
-                                           && s.IsLike());
+                                           && (s.Direction == Domain.Entities.SwipeDirection.Like || s.Direction == Domain.Entities.SwipeDirection.SuperLike));
 
                 if (reciprocalSwipe != null)
                 {
