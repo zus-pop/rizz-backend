@@ -462,3 +462,6 @@ scripts/**/*
 # Ignore the entire uploaded-voice directory and all future contents
 uploaded-voice/
 uploaded-voice/**/*
+
+# Firebase credentials (DO NOT COMMIT SECRETS)
+services/AuthService/AuthService.API/firebase_credentials.json
