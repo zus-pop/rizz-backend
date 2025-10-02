@@ -18,7 +18,7 @@ namespace UserService.Infrastructure.Services
         public async Task<string> SaveVoiceFileAsync(int userId, Stream fileStream, string originalFileName)
         {
             // Create upload directory if it doesn't exist
-            var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "uploaded-voice", "users");
+            var uploadDir = Path.Combine(_environment.ContentRootPath, "uploaded-voice", "users");
             Directory.CreateDirectory(uploadDir);
 
             // Generate unique filename
