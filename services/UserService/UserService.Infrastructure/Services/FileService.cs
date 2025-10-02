@@ -52,7 +52,7 @@ namespace UserService.Infrastructure.Services
 
         public async Task<(Stream FileStream, string ContentType, string FileName)?> GetVoiceFileAsync(int userId)
         {
-            var uploadDir = Path.Combine(Directory.GetCurrentDirectory(), "uploaded-voice", "users");
+            var uploadDir = Path.Combine(_environment.ContentRootPath, "uploaded-voice", "users");
             
             if (!Directory.Exists(uploadDir))
             {
