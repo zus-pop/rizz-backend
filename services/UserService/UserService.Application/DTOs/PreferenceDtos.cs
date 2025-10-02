@@ -11,9 +11,9 @@ namespace UserService.Application.DTOs
         public int? AgeRangeMax { get; set; }
         public int? LocationRadiusKm { get; set; }
         public string? InterestsFilter { get; set; }
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }
@@ -25,9 +25,9 @@ namespace UserService.Application.DTOs
         public int? AgeRangeMax { get; set; }
         public int? LocationRadiusKm { get; set; }
         public object? InterestsFilter { get; set; }
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
     }
 
     public class UpdatePreferenceDto
@@ -37,8 +37,8 @@ namespace UserService.Application.DTOs
         public int? AgeRangeMax { get; set; }
         public int? LocationRadiusKm { get; set; }
         public object? InterestsFilter { get; set; }
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
     }
 }

@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using UserService.Domain.Entities;
-using UserService.Domain.Enums;
 
 namespace UserService.Infrastructure.Data
 {
@@ -39,15 +38,15 @@ namespace UserService.Infrastructure.Data
             // Create Vietnamese profiles with Vietnamese characteristics
             var minhProfile = new Profile(userId: minh.Id);
             minhProfile.SetBio("Tôi là lập trình viên yêu thích du lịch và ẩm thực Việt Nam.");
-            minhProfile.SetEmotion(EmotionType.Vui);
-            minhProfile.SetVoiceQuality(VoiceQualityType.Am);
-            minhProfile.SetAccent(AccentType.DongNamBo); // Southeast accent (Minh from Ho Chi Minh City)
+            minhProfile.SetEmotion("Vui"); // Happy
+            minhProfile.SetVoiceQuality("Am"); // Warm
+            minhProfile.SetAccent("DongNamBo"); // Southeast accent (Minh from Ho Chi Minh City)
 
             var linhProfile = new Profile(userId: linh.Id);
             linhProfile.SetBio("Tôi thích đọc sách, nghe nhạc và khám phá các quán cà phê xinh xắn ở Hà Nội.");
-            linhProfile.SetEmotion(EmotionType.TuTin);
-            linhProfile.SetVoiceQuality(VoiceQualityType.Trong);
-            linhProfile.SetAccent(AccentType.DongBangSongHong); // Red River Delta accent (Linh from Hanoi)
+            linhProfile.SetEmotion("TuTin"); // Confident
+            linhProfile.SetVoiceQuality("Trong"); // Clear
+            linhProfile.SetAccent("DongBangSongHong"); // Red River Delta accent (Linh from Hanoi)
 
             await context.Profiles.AddRangeAsync(minhProfile, linhProfile);
             await context.SaveChangesAsync();

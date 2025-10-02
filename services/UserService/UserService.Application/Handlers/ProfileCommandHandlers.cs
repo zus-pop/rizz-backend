@@ -78,14 +78,14 @@ namespace UserService.Application.Handlers
                 profile.SetLoveLanguage(request.LoveLanguage);
             
             // New Vietnamese localization fields
-            if (request.Emotion.HasValue)
-                profile.SetEmotion(request.Emotion.Value);
+            if (!string.IsNullOrEmpty(request.Emotion))
+                profile.SetEmotion(request.Emotion);
                 
-            if (request.VoiceQuality.HasValue)
-                profile.SetVoiceQuality(request.VoiceQuality.Value);
+            if (!string.IsNullOrEmpty(request.VoiceQuality))
+                profile.SetVoiceQuality(request.VoiceQuality);
                 
-            if (request.Accent.HasValue)
-                profile.SetAccent(request.Accent.Value);
+            if (!string.IsNullOrEmpty(request.Accent))
+                profile.SetAccent(request.Accent);
             
             // Legacy fields for backward compatibility - these will be ignored since methods don't exist
             // The legacy properties are kept in commands for backward compatibility but not processed
@@ -141,14 +141,14 @@ namespace UserService.Application.Handlers
                 profile.SetLoveLanguage(request.LoveLanguage);
             
             // New Vietnamese localization fields
-            if (request.Emotion.HasValue)
-                profile.SetEmotion(request.Emotion.Value);
+            if (!string.IsNullOrEmpty(request.Emotion))
+                profile.SetEmotion(request.Emotion);
                 
-            if (request.VoiceQuality.HasValue)
-                profile.SetVoiceQuality(request.VoiceQuality.Value);
+            if (!string.IsNullOrEmpty(request.VoiceQuality))
+                profile.SetVoiceQuality(request.VoiceQuality);
                 
-            if (request.Accent.HasValue)
-                profile.SetAccent(request.Accent.Value);
+            if (!string.IsNullOrEmpty(request.Accent))
+                profile.SetAccent(request.Accent);
             
             // Legacy fields for backward compatibility - these will be ignored since methods don't exist
             // The legacy properties are kept in commands for backward compatibility but not processed

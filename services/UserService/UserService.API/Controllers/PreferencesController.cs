@@ -111,9 +111,9 @@ namespace UserService.API.Controllers
         public int? AgeMax { get; set; }
         public int? MaxDistanceKm { get; set; }
         public string? InterestsFilter { get; set; }
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
     }
 
     public class UpdatePreferenceRequest
@@ -123,8 +123,8 @@ namespace UserService.API.Controllers
         public int? AgeMax { get; set; }
         public int? MaxDistanceKm { get; set; }
         public string? InterestsFilter { get; set; }
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
     }
 }

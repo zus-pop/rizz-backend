@@ -228,8 +228,8 @@ namespace UserService.API.Controllers
         public string? LoveLanguage { get; set; }
         
         // New Vietnamese localization fields
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Emotion { get; set; }
+        public string? VoiceQuality { get; set; }
+        public string? Accent { get; set; }
     }
 }
