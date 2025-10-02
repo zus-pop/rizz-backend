@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.Json;
 using NotificationService.Application.Commands;
 using MediatR;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace NotificationService.Infrastructure.Messaging;
 
@@ -106,8 +108,8 @@ public class RabbitMqEventConsumer : IEventConsumer
             Title = "New Match! 🎉",
             Message = "You have a new match! Start chatting now.",
             Priority = "high",
-            Channels = new List<string> { "push", "in-app" },
-            Metadata = new Dictionary<string, string>
+            DeliveryChannels = new List<string> { "push", "in-app" },
+            Variables = new Dictionary<string, string>
             {
                 ["matchId"] = matchEvent.MatchId.ToString(),
                 ["partnerId"] = matchEvent.User2Id.ToString()
@@ -121,8 +123,8 @@ public class RabbitMqEventConsumer : IEventConsumer
             Title = "New Match! 🎉",
             Message = "You have a new match! Start chatting now.",
             Priority = "high",
-            Channels = new List<string> { "push", "in-app" },
-            Metadata = new Dictionary<string, string>
+            DeliveryChannels = new List<string> { "push", "in-app" },
+            Variables = new Dictionary<string, string>
             {
                 ["matchId"] = matchEvent.MatchId.ToString(),
                 ["partnerId"] = matchEvent.User1Id.ToString()
@@ -151,8 +153,8 @@ public class RabbitMqEventConsumer : IEventConsumer
             Title = "Purchase Confirmed! ✅",
             Message = $"Your {purchaseEvent.ProductType} purchase has been completed successfully.",
             Priority = "normal",
-            Channels = new List<string> { "push", "in-app", "email" },
-            Metadata = new Dictionary<string, string>
+            DeliveryChannels = new List<string> { "push", "in-app", "email" },
+            Variables = new Dictionary<string, string>
             {
                 ["purchaseId"] = purchaseEvent.PurchaseId.ToString(),
                 ["productType"] = purchaseEvent.ProductType,

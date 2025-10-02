@@ -5,6 +5,7 @@ using UserService.Application.Validators;
 using UserService.Domain.Repositories;
 using UserService.Infrastructure.Data;
 using UserService.Infrastructure.Repositories;
+using UserService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace UserService.API.Extensions
@@ -33,6 +34,9 @@ namespace UserService.API.Extensions
             services.AddScoped<IProfileRepository, ProfileRepository>();
             services.AddScoped<IPhotoRepository, PhotoRepository>();
             services.AddScoped<IPreferenceRepository, PreferenceRepository>();
+
+            // Add Services
+            services.AddScoped<IFileService, FileService>();
 
             // Add MediatR
             services.AddMediatR(cfg => 

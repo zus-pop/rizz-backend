@@ -1,13 +1,19 @@
 using NotificationService.Application;
 using NotificationService.Infrastructure;
 using NotificationService.API.Extensions;
+using NotificationService.API.Middleware;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add Console Logging first
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 // Add Serilog
 builder.Host.UseSerilog((context, configuration) =>
-    configuration.ReadFrom.Configuration(context.Configuration));
+    configuration.ReadFrom.Configuration(context.Configuration)
+        .WriteTo.Console());
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -72,6 +78,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseGlobalExceptionHandling();
 app.UseSerilogRequestLogging();
 
 app.UseRouting();
@@ -93,7 +100,9 @@ try
 }
 catch (Exception ex)
 {
-    Log.Fatal(ex, "NotificationService API terminated unexpectedly");
+    Log.Fatal(ex, "NotificationService API terminated unexpectedly: {ErrorMessage}", ex.Message);
+    Console.WriteLine($"Detailed error: {ex}");
+    throw;
 }
 finally
 {

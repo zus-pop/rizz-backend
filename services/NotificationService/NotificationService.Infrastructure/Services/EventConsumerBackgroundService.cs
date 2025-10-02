@@ -1,4 +1,6 @@
 using NotificationService.Infrastructure.Messaging;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace NotificationService.Infrastructure.Services;
 
