@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using NotificationService.Application.Interfaces;
 using NotificationService.Infrastructure.Data;
 using NotificationService.Infrastructure.Repositories;
 using NotificationService.Infrastructure.Services;
 using NotificationService.Infrastructure.Messaging;
-using RabbitMQ.Client;
+// using RabbitMQ.Client;
 
 namespace NotificationService.Infrastructure;
 
@@ -38,26 +39,12 @@ public static class DependencyInjection
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
-        // Add RabbitMQ
-        services.AddSingleton<IConnection>(provider =>
-        {
-            var factory = new ConnectionFactory
-            {
-                HostName = configuration["RabbitMQ:HostName"] ?? "localhost",
-                Port = int.Parse(configuration["RabbitMQ:Port"] ?? "5672"),
-                UserName = configuration["RabbitMQ:UserName"] ?? "guest",
-                Password = configuration["RabbitMQ:Password"] ?? "guest",
-                VirtualHost = configuration["RabbitMQ:VirtualHost"] ?? "/",
-                DispatchConsumersAsync = true
-            };
-
-            return factory.CreateConnection();
-        });
-
+        // RabbitMQ Services - Using resilient implementations
+        services.AddScoped<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
         services.AddScoped<IEventPublisher, RabbitMqEventPublisher>();
-        
-        // Add Event Consumer
         services.AddScoped<IEventConsumer, RabbitMqEventConsumer>();
+
+        // Background Services - Re-enabled with resilient connection handling
         services.AddHostedService<EventConsumerBackgroundService>();
 
         return services;

@@ -12,10 +12,18 @@ public static class MigrationExtensions
         
         try
         {
-            if (context.Database.GetPendingMigrations().Any())
+            app.Logger.LogInformation("Checking for pending migrations...");
+            var pendingMigrations = context.Database.GetPendingMigrations().ToList();
+            
+            if (pendingMigrations.Any())
             {
+                app.Logger.LogInformation("Found {Count} pending migrations: {Migrations}", pendingMigrations.Count, string.Join(", ", pendingMigrations));
                 await context.Database.MigrateAsync();
                 app.Logger.LogInformation("Database migrations applied successfully");
+            }
+            else
+            {
+                app.Logger.LogInformation("No pending migrations found");
             }
         }
         catch (Exception ex)

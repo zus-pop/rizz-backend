@@ -134,6 +134,18 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Create upload directories
+var uploadDirs = new[]
+{
+    Path.Combine(app.Environment.ContentRootPath, "uploaded-voice", "messages")
+};
+
+foreach (var dir in uploadDirs)
+{
+    Directory.CreateDirectory(dir);
+    app.Logger.LogInformation("Created upload directory: {Directory}", dir);
+}
+
 app.MapControllers();
 
 // Map SignalR Hub

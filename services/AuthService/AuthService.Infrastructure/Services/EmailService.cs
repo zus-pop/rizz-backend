@@ -23,8 +23,7 @@ namespace AuthService.Infrastructure.Services
             {
                 var smtpSettings = _configuration.GetSection("Smtp");
                 var host = smtpSettings["Host"];
-                int port;
-                if (!int.TryParse(smtpSettings["Port"], out port))
+                if (!int.TryParse(smtpSettings["Port"], out var port))
                 {
                     port = 587;
                     _logger.LogWarning("Invalid SMTP port configuration value '{PortValue}'. Using default port 587.", smtpSettings["Port"]);
