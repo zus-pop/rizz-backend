@@ -60,9 +60,24 @@ namespace MessagingService.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<IEnumerable<Message>> GetVoiceMessagesByMatchIdAsync(int matchId, CancellationToken cancellationToken = default)
+        {
+            return await _context.Messages
+                .Where(m => m.MatchId == matchId && m.Type == MessagingService.Domain.Enums.MessageType.Voice && !m.IsDeleted)
+                .OrderByDescending(m => m.CreatedAt)
+                .ToListAsync(cancellationToken);
+        }
+
         public async Task<Message> AddAsync(Message message, CancellationToken cancellationToken = default)
         {
             var result = await _context.Messages.AddAsync(message, cancellationToken);
+            return result.Entity;
+        }
+
+        public async Task<Message> CreateAsync(Message message, CancellationToken cancellationToken = default)
+        {
+            var result = await _context.Messages.AddAsync(message, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
             return result.Entity;
         }
 

@@ -313,23 +313,6 @@ curl -X POST http://localhost:5000/api/ai-insights/personality \
     "personalityTags": ["adventurous", "creative", "outgoing"]
   }'
 ```
-
-### 🔄 **Automated Testing**
-
-```bash
-# Run comprehensive service tests
-./scripts/testing/test-all-services.ps1
-
-# Test API endpoints
-./scripts/testing/test-api-endpoints.ps1
-
-# Test phone/SMS login flow
-./scripts/testing/test-phone-login.ps1
-
-# Health check all services
-./scripts/health-check.ps1
-```
-
 ---
 
 ## 📊 Monitoring & Observability

@@ -5,6 +5,8 @@ using PushService.Infrastructure.Data;
 using PushService.Domain.Repositories;
 using PushService.Infrastructure.Repositories;
 using PushService.Infrastructure.Services;
+using PushService.Infrastructure;
+using PushService.Application;
 using PushService.Application.Services;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
@@ -18,6 +20,29 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "Push Service API", Version = "v2.0" });
+    // Add JWT bearer definition
+    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Enter 'Bearer {token}'"
+    });
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            }, new string[] {}
+        }
+    });
 });
 
 // Database configuration
@@ -37,6 +62,8 @@ builder.Services.AddDbContext<PushDbContext>(options =>
 
 // Repository registration
 builder.Services.AddScoped<IDeviceTokenRepository, DeviceTokenRepository>();
+
+// Service registration  
 builder.Services.AddScoped<IPushNotificationService, FirebasePushNotificationService>();
 
 // MediatR registration

@@ -37,19 +37,58 @@ namespace UserService.Application.Handlers
 
             var profile = new DomainProfile(request.UserId);
             
+            // New fields
             if (!string.IsNullOrEmpty(request.Bio))
                 profile.SetBio(request.Bio);
             
-            if (!string.IsNullOrEmpty(request.Job))
-                profile.SetJob(request.Job);
+            if (!string.IsNullOrEmpty(request.Voice))
+                profile.SetVoice(request.Voice);
+                
+            if (!string.IsNullOrEmpty(request.University))
+                profile.SetUniversity(request.University);
+                
+            if (!string.IsNullOrEmpty(request.InterestedIn))
+                profile.SetInterestedIn(request.InterestedIn);
+                
+            if (!string.IsNullOrEmpty(request.LookingFor))
+                profile.SetLookingFor(request.LookingFor);
+                
+            if (!string.IsNullOrEmpty(request.StudyStyle))
+                profile.SetStudyStyle(request.StudyStyle);
+                
+            if (!string.IsNullOrEmpty(request.WeekendHobby))
+                profile.SetWeekendHobby(request.WeekendHobby);
+                
+            if (!string.IsNullOrEmpty(request.CampusLife))
+                profile.SetCampusLife(request.CampusLife);
+                
+            if (!string.IsNullOrEmpty(request.FuturePlan))
+                profile.SetFuturePlan(request.FuturePlan);
+                
+            if (!string.IsNullOrEmpty(request.CommunicationPreference))
+                profile.SetCommunicationPreference(request.CommunicationPreference);
+                
+            if (!string.IsNullOrEmpty(request.DealBreakers))
+                profile.SetDealBreakers(request.DealBreakers);
+                
+            if (!string.IsNullOrEmpty(request.Zodiac))
+                profile.SetZodiac(request.Zodiac);
+                
+            if (!string.IsNullOrEmpty(request.LoveLanguage))
+                profile.SetLoveLanguage(request.LoveLanguage);
             
-            if (!string.IsNullOrEmpty(request.School))
-                profile.SetSchool(request.School);
+            // New Vietnamese localization fields
+            if (request.Emotion.HasValue)
+                profile.SetEmotion(request.Emotion.Value);
+                
+            if (request.VoiceQuality.HasValue)
+                profile.SetVoiceQuality(request.VoiceQuality.Value);
+                
+            if (request.Accent.HasValue)
+                profile.SetAccent(request.Accent.Value);
             
-            profile.SetInterestedInAgeRange(request.InterestedInAgeMin, request.InterestedInAgeMax);
-            profile.SetInterestedInGender(request.InterestedInGender);
-            profile.SetMaxDistance(request.MaxDistanceKm);
-            profile.SetShowOnlyVerified(request.ShowOnlyVerified);
+            // Legacy fields for backward compatibility - these will be ignored since methods don't exist
+            // The legacy properties are kept in commands for backward compatibility but not processed
 
             var createdProfile = await _profileRepository.AddAsync(profile, cancellationToken);
             return _mapper.Map<ProfileDto>(createdProfile);
@@ -61,26 +100,58 @@ namespace UserService.Application.Handlers
             if (profile == null)
                 throw new ArgumentException("Profile not found");
 
+            // New fields
             if (request.Bio != null)
                 profile.SetBio(request.Bio);
+                
+            if (request.Voice != null)
+                profile.SetVoice(request.Voice);
+                
+            if (request.University != null)
+                profile.SetUniversity(request.University);
+                
+            if (request.InterestedIn != null)
+                profile.SetInterestedIn(request.InterestedIn);
+                
+            if (request.LookingFor != null)
+                profile.SetLookingFor(request.LookingFor);
+                
+            if (request.StudyStyle != null)
+                profile.SetStudyStyle(request.StudyStyle);
+                
+            if (request.WeekendHobby != null)
+                profile.SetWeekendHobby(request.WeekendHobby);
+                
+            if (request.CampusLife != null)
+                profile.SetCampusLife(request.CampusLife);
+                
+            if (request.FuturePlan != null)
+                profile.SetFuturePlan(request.FuturePlan);
+                
+            if (request.CommunicationPreference != null)
+                profile.SetCommunicationPreference(request.CommunicationPreference);
+                
+            if (request.DealBreakers != null)
+                profile.SetDealBreakers(request.DealBreakers);
+                
+            if (request.Zodiac != null)
+                profile.SetZodiac(request.Zodiac);
+                
+            if (request.LoveLanguage != null)
+                profile.SetLoveLanguage(request.LoveLanguage);
             
-            if (request.Job != null)
-                profile.SetJob(request.Job);
+            // New Vietnamese localization fields
+            if (request.Emotion.HasValue)
+                profile.SetEmotion(request.Emotion.Value);
+                
+            if (request.VoiceQuality.HasValue)
+                profile.SetVoiceQuality(request.VoiceQuality.Value);
+                
+            if (request.Accent.HasValue)
+                profile.SetAccent(request.Accent.Value);
             
-            if (request.School != null)
-                profile.SetSchool(request.School);
-            
-            if (request.InterestedInAgeMin.HasValue || request.InterestedInAgeMax.HasValue)
-                profile.SetInterestedInAgeRange(request.InterestedInAgeMin, request.InterestedInAgeMax);
-            
-            if (request.InterestedInGender != null)
-                profile.SetInterestedInGender(request.InterestedInGender);
-            
-            if (request.MaxDistanceKm.HasValue)
-                profile.SetMaxDistance(request.MaxDistanceKm);
-            
-            if (request.ShowOnlyVerified.HasValue)
-                profile.SetShowOnlyVerified(request.ShowOnlyVerified.Value);
+            // Legacy fields for backward compatibility - these will be ignored since methods don't exist
+            // The legacy properties are kept in commands for backward compatibility but not processed
 
             await _profileRepository.UpdateAsync(profile, cancellationToken);
             return _mapper.Map<ProfileDto>(profile);

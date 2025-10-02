@@ -1,16 +1,26 @@
+using UserService.Domain.Enums;
+
 namespace UserService.Domain.Entities
 {
     public class Profile : BaseEntity
     {
         public int UserId { get; private set; }
         public string? Bio { get; private set; }
-        public string? Job { get; private set; }
-        public string? School { get; private set; }
-        public int? InterestedInAgeMin { get; private set; }
-        public int? InterestedInAgeMax { get; private set; }
-        public string? InterestedInGender { get; private set; }
-        public double? MaxDistanceKm { get; private set; }
-        public bool ShowOnlyVerified { get; private set; }
+        public string? Voice { get; private set; } // URL to audio intro
+        public EmotionType? Emotion { get; private set; }
+        public VoiceQualityType? VoiceQuality { get; private set; }
+        public AccentType? Accent { get; private set; }
+        public string? University { get; private set; }
+        public string? InterestedIn { get; private set; }
+        public string? LookingFor { get; private set; }
+        public string? StudyStyle { get; private set; }
+        public string? WeekendHobby { get; private set; }
+        public string? CampusLife { get; private set; }
+        public string? FuturePlan { get; private set; }
+        public string? CommunicationPreference { get; private set; }
+        public string? DealBreakers { get; private set; }
+        public string? Zodiac { get; private set; }
+        public string? LoveLanguage { get; private set; }
 
         private Profile() { } // For EF Core
 
@@ -25,64 +35,93 @@ namespace UserService.Domain.Entities
             SetUpdatedAt();
         }
 
-        public void SetJob(string? job)
+        public void SetVoice(string? voice)
         {
-            Job = job?.Trim();
+            Voice = voice?.Trim();
             SetUpdatedAt();
         }
 
-        public void SetSchool(string? school)
+        public void SetEmotion(EmotionType? emotion)
         {
-            School = school?.Trim();
+            Emotion = emotion;
             SetUpdatedAt();
         }
 
-        public void SetInterestedInAgeRange(int? minAge, int? maxAge)
+        public void SetVoiceQuality(VoiceQualityType? voiceQuality)
         {
-            if (minAge.HasValue && minAge < 18)
-                throw new ArgumentException("Minimum age cannot be less than 18", nameof(minAge));
-
-            if (maxAge.HasValue && maxAge > 100)
-                throw new ArgumentException("Maximum age cannot be greater than 100", nameof(maxAge));
-
-            if (minAge.HasValue && maxAge.HasValue && minAge > maxAge)
-                throw new ArgumentException("Minimum age cannot be greater than maximum age");
-
-            InterestedInAgeMin = minAge;
-            InterestedInAgeMax = maxAge;
+            VoiceQuality = voiceQuality;
             SetUpdatedAt();
         }
 
-        public void SetInterestedInGender(string? gender)
+        public void SetAccent(AccentType? accent)
         {
-            if (!string.IsNullOrEmpty(gender))
-            {
-                var validGenders = new[] { "male", "female", "both" };
-                if (!validGenders.Contains(gender.ToLower()))
-                    throw new ArgumentException("Invalid gender preference", nameof(gender));
-                
-                InterestedInGender = gender.ToLower();
-            }
-            else
-            {
-                InterestedInGender = null;
-            }
-            
+            Accent = accent;
             SetUpdatedAt();
         }
 
-        public void SetMaxDistance(double? maxDistanceKm)
+        public void SetUniversity(string? university)
         {
-            if (maxDistanceKm.HasValue && (maxDistanceKm <= 0 || maxDistanceKm > 1000))
-                throw new ArgumentException("Max distance must be between 0 and 1000 km", nameof(maxDistanceKm));
-
-            MaxDistanceKm = maxDistanceKm;
+            University = university?.Trim();
             SetUpdatedAt();
         }
 
-        public void SetShowOnlyVerified(bool showOnlyVerified)
+        public void SetInterestedIn(string? interestedIn)
         {
-            ShowOnlyVerified = showOnlyVerified;
+            InterestedIn = interestedIn?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetLookingFor(string? lookingFor)
+        {
+            LookingFor = lookingFor?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetStudyStyle(string? studyStyle)
+        {
+            StudyStyle = studyStyle?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetWeekendHobby(string? weekendHobby)
+        {
+            WeekendHobby = weekendHobby?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetCampusLife(string? campusLife)
+        {
+            CampusLife = campusLife?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetFuturePlan(string? futurePlan)
+        {
+            FuturePlan = futurePlan?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetCommunicationPreference(string? communicationPreference)
+        {
+            CommunicationPreference = communicationPreference?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetDealBreakers(string? dealBreakers)
+        {
+            DealBreakers = dealBreakers?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetZodiac(string? zodiac)
+        {
+            Zodiac = zodiac?.Trim();
+            SetUpdatedAt();
+        }
+
+        public void SetLoveLanguage(string? loveLanguage)
+        {
+            LoveLanguage = loveLanguage?.Trim();
             SetUpdatedAt();
         }
     }

@@ -414,15 +414,51 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/csharp
 
 # Testing and Documentation (Generated during development)
+# Ignore entire docs folder and all contents (including future files)
 docs/
-scripts/testing/
-scripts/utilities/
+docs/**/*
 
-# Additional test files and documentation
+# Ignore entire scripts folder and all contents (including future files)  
+scripts/
+scripts/**/*
+
+# Additional test files and documentation patterns
 *.test.md
 *_TEST_*.md
 *_RESULTS_*.md
+*_GUIDE*.md
+*_QUICK_START*.md
+*_MODERNIZATION*.md
+*_REFACTORING*.md
+*_IMPLEMENTATION*.md
+*_SUCCESS*.md
+*_ENHANCED_*.md
 *.test.ps1
 *test*.ps1
 *verify*.ps1
+*comprehensive*.ps1
 *.test.py
+*.test.sh
+
+# Any markdown files in testing-results folders
+**/testing-results/
+**/testing-results/**/*
+
+# Development utilities and migration scripts
+**/utilities/
+**/migration*.ps1
+**/dockerfile*.ps1
+
+# Future development artifacts (patterns for automatic ignore)
+**/*_DEV_*.md
+**/*_TEMP_*.md
+**/*_WIP_*.md
+**/temp-*
+**/dev-*
+**/*.development.*
+**/*.temp.*
+
+# Voice Upload Files - Local storage for uploaded voice files
+# Ignore the entire uploaded-voice directory and all future contents
+uploaded-voice/
+uploaded-voice/**/*
