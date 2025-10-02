@@ -4,9 +4,9 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add Serilog - temporarily disable to test
-// builder.Host.UseSerilog((context, configuration) =>
-//     configuration.ReadFrom.Configuration(context.Configuration));
+// Add Serilog
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
 
 // Add services to the container
 builder.Services.AddControllers();
@@ -21,34 +21,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { 
-        Title = "Purchase Service API", 
-        Version = "v1",
-        Description = "API for managing purchases, subscriptions, and payment processing"
-    });
-    // Add JWT bearer definition
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        Description = "Enter 'Bearer {token}'"
-    });
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-            {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            }, new string[] {}
-        }
-    });
+    c.SwaggerDoc("v1", new() { Title = "Purchase Service API", Version = "v1" });
 });
 
 // Add CORS
@@ -74,7 +47,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// app.UseSerilogRequestLogging();
+app.UseSerilogRequestLogging();
 
 app.UseCors("AllowAll");
 
@@ -88,14 +61,11 @@ app.MapHealthChecks("/health");
 try
 {
     await app.Services.MigrateDatabaseAsync();
-    Console.WriteLine("PurchaseService database migration completed successfully");
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"FATAL: An error occurred while migrating the database: {ex.Message}");
-    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-    throw;
+    Log.Fatal(ex, "An error occurred while migrating the database");
+    return;
 }
 
-Console.WriteLine("Starting PurchaseService...");
 app.Run();

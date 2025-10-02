@@ -33,7 +33,6 @@ namespace UserService.Application.Validators
 
             RuleFor(x => x.Birthday)
                 .Must(BeValidBirthday).WithMessage("Birthday must be a valid past date")
-                .Must(BeAtLeast18).WithMessage("User must be at least 18 years old")
                 .When(x => x.Birthday.HasValue);
 
             RuleFor(x => x.Height)
@@ -41,18 +40,17 @@ namespace UserService.Application.Validators
                 .LessThanOrEqualTo(300).WithMessage("Height must be less than or equal to 300 cm")
                 .When(x => x.Height.HasValue);
 
-            RuleFor(x => x.Location!.Latitude)
+            RuleFor(x => x.Location.Latitude)
                 .InclusiveBetween(-90, 90).WithMessage("Latitude must be between -90 and 90")
-                .When(x => x.Location is not null);
+                .When(x => x.Location != null);
 
-            RuleFor(x => x.Location!.Longitude)
+            RuleFor(x => x.Location.Longitude)
                 .InclusiveBetween(-180, 180).WithMessage("Longitude must be between -180 and 180")
-                .When(x => x.Location is not null);
+                .When(x => x.Location != null);
         }
 
-        private bool BeValidGender(string? gender)
+        private bool BeValidGender(string gender)
         {
-            if (string.IsNullOrWhiteSpace(gender)) return false;
             var validGenders = new[] { "male", "female", "other" };
             return validGenders.Contains(gender.ToLower());
         }
@@ -61,15 +59,6 @@ namespace UserService.Application.Validators
         {
             if (!birthday.HasValue) return true;
             return birthday.Value <= DateTime.Today && birthday.Value >= DateTime.Today.AddYears(-120);
-        }
-
-        private bool BeAtLeast18(DateTime? birthday)
-        {
-            if (!birthday.HasValue) return true; // handled separately if required
-            var today = DateTime.Today;
-            var age = today.Year - birthday.Value.Year;
-            if (birthday.Value.Date > today.AddYears(-age)) age--;
-            return age >= 18;
         }
     }
 
@@ -113,18 +102,17 @@ namespace UserService.Application.Validators
                 .LessThanOrEqualTo(300).WithMessage("Height must be less than or equal to 300 cm")
                 .When(x => x.Height.HasValue);
 
-            RuleFor(x => x.Location!.Latitude)
+            RuleFor(x => x.Location.Latitude)
                 .InclusiveBetween(-90, 90).WithMessage("Latitude must be between -90 and 90")
-                .When(x => x.Location is not null);
+                .When(x => x.Location != null);
 
-            RuleFor(x => x.Location!.Longitude)
+            RuleFor(x => x.Location.Longitude)
                 .InclusiveBetween(-180, 180).WithMessage("Longitude must be between -180 and 180")
-                .When(x => x.Location is not null);
+                .When(x => x.Location != null);
         }
 
-        private bool BeValidGender(string? gender)
+        private bool BeValidGender(string gender)
         {
-            if (string.IsNullOrWhiteSpace(gender)) return false;
             var validGenders = new[] { "male", "female", "other" };
             return validGenders.Contains(gender.ToLower());
         }

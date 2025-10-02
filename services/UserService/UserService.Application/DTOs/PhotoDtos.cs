@@ -6,8 +6,8 @@ namespace UserService.Application.DTOs
         public int UserId { get; set; }
         public string Url { get; set; } = string.Empty;
         public string? Description { get; set; }
-        public bool IsMain { get; set; }
-        public int Order { get; set; }
+        public bool IsMainPhoto { get; set; }
+        public int DisplayOrder { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }

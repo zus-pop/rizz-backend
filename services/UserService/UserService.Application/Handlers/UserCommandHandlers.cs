@@ -44,14 +44,7 @@ namespace UserService.Application.Handlers
             );
 
             if (request.Birthday.HasValue)
-            {
-                var today = DateTime.UtcNow.Date;
-                var age = today.Year - request.Birthday.Value.Year;
-                if (request.Birthday.Value.Date > today.AddYears(-age)) age--;
-                if (age < 18)
-                    throw new ArgumentException("User must be at least 18 years old");
                 user.SetBirthday(request.Birthday.Value);
-            }
 
             if (request.Height.HasValue)
                 user.SetHeight(request.Height.Value);

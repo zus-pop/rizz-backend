@@ -2,8 +2,8 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PurchaseService.Infrastructure.Persistence;
 
 #nullable disable
@@ -18,39 +18,39 @@ namespace PurchaseService.Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "8.0.0")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("PurchaseService.Domain.Entities.Purchase", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Metadata")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProductId")
                         .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ProductName")
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .IsRequired()
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -70,19 +70,19 @@ namespace PurchaseService.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("ChangedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.Property<Guid>("PurchaseId")
-                        .HasColumnType("uuid");
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -100,17 +100,17 @@ namespace PurchaseService.Infrastructure.Migrations
                     b.OwnsOne("PurchaseService.Domain.ValueObjects.Money", "Amount", b1 =>
                         {
                             b1.Property<Guid>("PurchaseId")
-                                .HasColumnType("uuid");
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<decimal>("Amount")
                                 .HasPrecision(18, 2)
-                                .HasColumnType("numeric(18,2)")
+                                .HasColumnType("decimal(18,2)")
                                 .HasColumnName("Amount");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("character varying(3)")
+                                .HasColumnType("nvarchar(3)")
                                 .HasColumnName("Currency");
 
                             b1.HasKey("PurchaseId");
@@ -124,21 +124,21 @@ namespace PurchaseService.Infrastructure.Migrations
                     b.OwnsOne("PurchaseService.Domain.ValueObjects.PurchaseStatus", "Status", b1 =>
                         {
                             b1.Property<Guid>("PurchaseId")
-                                .HasColumnType("uuid");
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Reason")
                                 .HasMaxLength(500)
-                                .HasColumnType("character varying(500)")
+                                .HasColumnType("nvarchar(500)")
                                 .HasColumnName("StatusReason");
 
                             b1.Property<string>("Status")
                                 .IsRequired()
                                 .HasMaxLength(20)
-                                .HasColumnType("character varying(20)")
+                                .HasColumnType("nvarchar(20)")
                                 .HasColumnName("Status");
 
                             b1.Property<DateTime>("Timestamp")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("datetime2")
                                 .HasColumnName("StatusTimestamp");
 
                             b1.HasKey("PurchaseId");
@@ -152,37 +152,37 @@ namespace PurchaseService.Infrastructure.Migrations
                     b.OwnsOne("PurchaseService.Domain.Entities.Refund", "Refund", b1 =>
                         {
                             b1.Property<Guid>("PurchaseId")
-                                .HasColumnType("uuid");
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<DateTime>("CreatedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("datetime2")
                                 .HasColumnName("RefundCreatedAt");
 
                             b1.Property<string>("ExternalRefundId")
                                 .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("nvarchar(100)")
                                 .HasColumnName("RefundExternalId");
 
                             b1.Property<Guid>("Id")
-                                .HasColumnType("uuid");
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<DateTime?>("ProcessedAt")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("datetime2")
                                 .HasColumnName("RefundProcessedAt");
 
                             b1.Property<string>("Reason")
                                 .HasMaxLength(500)
-                                .HasColumnType("character varying(500)")
+                                .HasColumnType("nvarchar(500)")
                                 .HasColumnName("RefundReason");
 
                             b1.Property<string>("Status")
                                 .IsRequired()
                                 .HasMaxLength(20)
-                                .HasColumnType("character varying(20)")
+                                .HasColumnType("nvarchar(20)")
                                 .HasColumnName("RefundStatus");
 
                             b1.Property<DateTime?>("UpdatedAt")
-                                .HasColumnType("timestamp with time zone");
+                                .HasColumnType("datetime2");
 
                             b1.HasKey("PurchaseId");
 
@@ -194,17 +194,17 @@ namespace PurchaseService.Infrastructure.Migrations
                             b1.OwnsOne("PurchaseService.Domain.ValueObjects.Money", "Amount", b2 =>
                                 {
                                     b2.Property<Guid>("RefundPurchaseId")
-                                        .HasColumnType("uuid");
+                                        .HasColumnType("uniqueidentifier");
 
                                     b2.Property<decimal>("Amount")
                                         .HasPrecision(18, 2)
-                                        .HasColumnType("numeric(18,2)")
+                                        .HasColumnType("decimal(18,2)")
                                         .HasColumnName("RefundAmount");
 
                                     b2.Property<string>("Currency")
                                         .IsRequired()
                                         .HasMaxLength(3)
-                                        .HasColumnType("character varying(3)")
+                                        .HasColumnType("nvarchar(3)")
                                         .HasColumnName("RefundCurrency");
 
                                     b2.HasKey("RefundPurchaseId");
@@ -224,28 +224,28 @@ namespace PurchaseService.Infrastructure.Migrations
                     b.OwnsOne("PurchaseService.Domain.ValueObjects.PaymentMethod", "PaymentMethod", b1 =>
                         {
                             b1.Property<Guid>("PurchaseId")
-                                .HasColumnType("uuid");
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("ExternalTransactionId")
                                 .HasMaxLength(100)
-                                .HasColumnType("character varying(100)")
+                                .HasColumnType("nvarchar(100)")
                                 .HasColumnName("ExternalTransactionId");
 
                             b1.Property<string>("Metadata")
                                 .IsRequired()
-                                .HasColumnType("text")
+                                .HasColumnType("nvarchar(max)")
                                 .HasColumnName("PaymentMetadata");
 
                             b1.Property<string>("Provider")
                                 .IsRequired()
                                 .HasMaxLength(50)
-                                .HasColumnType("character varying(50)")
+                                .HasColumnType("nvarchar(50)")
                                 .HasColumnName("PaymentProvider");
 
                             b1.Property<string>("Type")
                                 .IsRequired()
                                 .HasMaxLength(20)
-                                .HasColumnType("character varying(20)")
+                                .HasColumnType("nvarchar(20)")
                                 .HasColumnName("PaymentMethodType");
 
                             b1.HasKey("PurchaseId");
@@ -259,23 +259,23 @@ namespace PurchaseService.Infrastructure.Migrations
                     b.OwnsOne("PurchaseService.Domain.ValueObjects.SubscriptionPeriod", "SubscriptionPeriod", b1 =>
                         {
                             b1.Property<Guid>("PurchaseId")
-                                .HasColumnType("uuid");
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<int>("Duration")
-                                .HasColumnType("integer")
+                                .HasColumnType("int")
                                 .HasColumnName("SubscriptionDuration");
 
                             b1.Property<DateTime>("EndDate")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("datetime2")
                                 .HasColumnName("SubscriptionEndDate");
 
                             b1.Property<DateTime>("StartDate")
-                                .HasColumnType("timestamp with time zone")
+                                .HasColumnType("datetime2")
                                 .HasColumnName("SubscriptionStartDate");
 
                             b1.Property<string>("Type")
                                 .IsRequired()
-                                .HasColumnType("text")
+                                .HasColumnType("nvarchar(max)")
                                 .HasColumnName("SubscriptionType");
 
                             b1.HasKey("PurchaseId");
@@ -311,17 +311,17 @@ namespace PurchaseService.Infrastructure.Migrations
                     b.OwnsOne("PurchaseService.Domain.ValueObjects.PurchaseStatus", "Status", b1 =>
                         {
                             b1.Property<Guid>("PurchaseStatusHistoryId")
-                                .HasColumnType("uuid");
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<string>("Reason")
                                 .HasMaxLength(500)
-                                .HasColumnType("character varying(500)")
+                                .HasColumnType("nvarchar(500)")
                                 .HasColumnName("Reason");
 
                             b1.Property<string>("Status")
                                 .IsRequired()
                                 .HasMaxLength(20)
-                                .HasColumnType("character varying(20)")
+                                .HasColumnType("nvarchar(20)")
                                 .HasColumnName("Status");
 
                             b1.HasKey("PurchaseStatusHistoryId");

@@ -53,7 +53,7 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Purchase>
                 
             payment.Property(pm => pm.Metadata)
                 .HasColumnName("PaymentMetadata")
-                .HasColumnType("text")
+                .HasColumnType("nvarchar(max)")
                 .HasConversion(
                     v => v != null ? System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null) : null,
                     v => v != null ? System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(v, (System.Text.Json.JsonSerializerOptions?)null) : null);
@@ -96,7 +96,7 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Purchase>
         
         // Configure Metadata
         builder.Property(p => p.Metadata)
-            .HasColumnType("text")
+            .HasColumnType("nvarchar(max)")
             .HasConversion(
                 v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
                 v => System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new());

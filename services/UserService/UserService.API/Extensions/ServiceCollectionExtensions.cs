@@ -5,7 +5,6 @@ using UserService.Application.Validators;
 using UserService.Domain.Repositories;
 using UserService.Infrastructure.Data;
 using UserService.Infrastructure.Repositories;
-using UserService.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace UserService.API.Extensions
@@ -17,7 +16,7 @@ namespace UserService.API.Extensions
             // Add Database
             services.AddDbContext<UserDbContext>(options =>
             {
-                var connectionString = configuration.GetConnectionString("Postgres");
+                var connectionString = configuration.GetConnectionString("DefaultConnection");
                 options.UseNpgsql(connectionString, npgsqlOptions =>
                 {
                     npgsqlOptions.EnableRetryOnFailure(
@@ -33,10 +32,6 @@ namespace UserService.API.Extensions
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IProfileRepository, ProfileRepository>();
             services.AddScoped<IPhotoRepository, PhotoRepository>();
-            services.AddScoped<IPreferenceRepository, PreferenceRepository>();
-
-            // Add Services
-            services.AddScoped<IFileService, FileService>();
 
             // Add MediatR
             services.AddMediatR(cfg => 
