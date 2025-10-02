@@ -1,109 +1,139 @@
-﻿using AuthService.Infrastructure.Data;
-using AuthService.API;
-using AuthService.API.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using AuthService.Infrastructure.Data;
+using AuthService.API;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddAuthService(builder.Configuration);
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
 
-// Authentication & Authorization
-builder.Services.AddAuthentication(options =>
+// Register Clean Architecture dependencies
+builder.Services.AddAuthService(builder.Configuration);
+
+
+// Add Authentication
+var jwtConfig = builder.Configuration.GetSection("Jwt");
+var key = Encoding.ASCII.GetBytes(jwtConfig["Secret"] ?? jwtConfig["Key"] ?? "default-key");
+
+builder.Services.AddAuthentication(opt =>
 {
-    options.DefaultAuthenticateScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-.AddJwtBearer(options =>
+.AddJwtBearer(opt =>
 {
-    var jwtSection = builder.Configuration.GetSection("Jwt");
-    var key = jwtSection["Key"] ?? "default_secret_key_for_development_minimum_32_characters_long";
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    opt.RequireHttpsMetadata = false;
+    opt.SaveToken = true;
+    opt.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(key)),
         ValidateIssuer = true,
-        ValidIssuer = jwtSection["Issuer"] ?? "AuthService",
         ValidateAudience = true,
-        ValidAudience = jwtSection["Audience"] ?? "AuthService",
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtConfig["Issuer"],
+        ValidAudience = jwtConfig["Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
-builder.Services.AddAuthorization();
 
+builder.Services.AddControllers();
+
+// Add health checks
+builder.Services.AddHealthChecks();
+
+// Add CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+// Add Swagger/OpenAPI support
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
-    {
-        Title = "Authentication Service API",
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
+    { 
+        Title = "Auth Service API", 
         Version = "v1",
-        Description = "API for user authentication, registration, and OTP verification"
-    });
-    // Add JWT bearer definition
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
-        Scheme = "bearer",
-        BearerFormat = "JWT",
-        Description = "Enter 'Bearer {token}'"
-    });
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
-    {
-        {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
-            {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
-                {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            }, new string[] {}
-        }
+        Description = "API for user authentication and authorization"
     });
 });
 
 var app = builder.Build();
 
-// Add global exception handling middleware
-app.UseMiddleware<GlobalExceptionMiddleware>();
+// Log the connection string for debugging
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+logger.LogInformation("Using connection string: {ConnectionString}", connectionString);
 
-try {
-    using var scope = app.Services.CreateScope();
-    var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    // Test basic connection first
-    var canConnect = await context.Database.CanConnectAsync();
-    if (canConnect) {
-        // Skip migration for now since tables are manually created
-        // await context.Database.MigrateAsync();
-        Console.WriteLine("Database connection successful - tables already exist");
-        
-        // Seed sample data with proper BCrypt hashes
-        await AuthSampleDataSeeder.SeedSampleDataAsync(context);
-        Console.WriteLine("Sample data seeded successfully");
-    } else {
-        Console.WriteLine("Cannot connect to database - will continue without DB");
-    }
-}
-catch (Exception ex) {
-    Console.WriteLine($"Database setup failed: {ex.Message}");
-}
+// Ensure database is created and migrations are applied
+await EnsureDatabaseAsync(app);
 
-if (app.Environment.IsDevelopment()) {
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Authentication Service API v1");
-        c.RoutePrefix = "swagger";
-    });
+    app.UseSwaggerUI();
 }
 
-app.UseRateLimiter();
+// Use CORS
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Map health checks
+app.MapHealthChecks("/health");
+
 app.MapControllers();
+
+// Configure to listen on all interfaces
 app.Urls.Add("http://0.0.0.0:8080");
+
 app.Run();
+
+static async Task EnsureDatabaseAsync(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    
+    // Wait for database to be available with retry logic
+    var maxRetries = 10;
+    var retryDelay = TimeSpan.FromSeconds(5);
+    
+    for (int i = 0; i < maxRetries; i++)
+    {
+        try
+        {
+            logger.LogInformation("Attempting to connect to database (attempt {Attempt}/{MaxRetries})", i + 1, maxRetries);
+            
+            // Test database connectivity
+            await context.Database.CanConnectAsync();
+            logger.LogInformation("Database connection successful");
+            
+            // Apply migrations
+            logger.LogInformation("Applying database migrations...");
+            await context.Database.MigrateAsync();
+            logger.LogInformation("Database migrations completed successfully");
+            break;
+        }
+        catch (Exception ex) when (i < maxRetries - 1)
+        {
+            logger.LogWarning(ex, "Database connection failed (attempt {Attempt}/{MaxRetries}): {Error}. Retrying in {Delay} seconds...", 
+                i + 1, maxRetries, ex.Message, retryDelay.TotalSeconds);
+            await Task.Delay(retryDelay);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to connect to database after {MaxRetries} attempts", maxRetries);
+            throw; // Re-throw after all retries exhausted
+        }
+    }
+}

@@ -1,16 +1,13 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using UserService.Application.Commands;
 using UserService.Application.DTOs;
 using UserService.Application.Queries;
-using UserService.Domain.Enums;
 
 namespace UserService.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class ProfilesController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -67,23 +64,13 @@ namespace UserService.API.Controllers
                 {
                     UserId = request.UserId,
                     Bio = request.Bio,
-                    Voice = request.Voice,
-                    University = request.University,
-                    InterestedIn = request.InterestedIn,
-                    LookingFor = request.LookingFor,
-                    StudyStyle = request.StudyStyle,
-                    WeekendHobby = request.WeekendHobby,
-                    CampusLife = request.CampusLife,
-                    FuturePlan = request.FuturePlan,
-                    CommunicationPreference = request.CommunicationPreference,
-                    DealBreakers = request.DealBreakers,
-                    Zodiac = request.Zodiac,
-                    LoveLanguage = request.LoveLanguage,
-                    
-                    // New Vietnamese localization fields
-                    Emotion = request.Emotion,
-                    VoiceQuality = request.VoiceQuality,
-                    Accent = request.Accent
+                    Job = request.Job,
+                    School = request.School,
+                    InterestedInAgeMin = request.InterestedInAgeMin,
+                    InterestedInAgeMax = request.InterestedInAgeMax,
+                    InterestedInGender = request.InterestedInGender,
+                    MaxDistanceKm = request.MaxDistanceKm,
+                    ShowOnlyVerified = request.ShowOnlyVerified
                 };
 
                 var profile = await _mediator.Send(command);
@@ -110,23 +97,13 @@ namespace UserService.API.Controllers
                 {
                     UserId = userId,
                     Bio = dto.Bio,
-                    Voice = dto.Voice,
-                    University = dto.University,
-                    InterestedIn = dto.InterestedIn,
-                    LookingFor = dto.LookingFor,
-                    StudyStyle = dto.StudyStyle,
-                    WeekendHobby = dto.WeekendHobby,
-                    CampusLife = dto.CampusLife,
-                    FuturePlan = dto.FuturePlan,
-                    CommunicationPreference = dto.CommunicationPreference,
-                    DealBreakers = dto.DealBreakers,
-                    Zodiac = dto.Zodiac,
-                    LoveLanguage = dto.LoveLanguage,
-                    
-                    // New Vietnamese localization fields
-                    Emotion = dto.Emotion,
-                    VoiceQuality = dto.VoiceQuality,
-                    Accent = dto.Accent
+                    Job = dto.Job,
+                    School = dto.School,
+                    InterestedInAgeMin = dto.InterestedInAgeMin,
+                    InterestedInAgeMax = dto.InterestedInAgeMax,
+                    InterestedInGender = dto.InterestedInGender,
+                    MaxDistanceKm = dto.MaxDistanceKm,
+                    ShowOnlyVerified = dto.ShowOnlyVerified
                 };
 
                 var profile = await _mediator.Send(command);
@@ -166,70 +143,18 @@ namespace UserService.API.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
-
-        // TODO: Re-implement profile matching with new Vietnamese schema
-        /*
-        [HttpGet("matches/{userId}")]
-        public async Task<IActionResult> GetProfileMatches(int userId, 
-            [FromQuery] double? latitude = null,
-            [FromQuery] double? longitude = null,
-            [FromQuery] int page = 1, 
-            [FromQuery] int pageSize = 10)
-        {
-            try
-            {
-                var query = new GetProfilesByPreferencesQuery
-                {
-                    UserId = userId,
-                    UserLatitude = latitude,
-                    UserLongitude = longitude,
-                    Page = page,
-                    PageSize = pageSize
-                };
-
-                var profiles = await _mediator.Send(query);
-
-                return Ok(new
-                {
-                    success = true,
-                    data = profiles,
-                    pagination = new
-                    {
-                        page = page,
-                        pageSize = pageSize,
-                        hasNext = profiles.Count() == pageSize
-                    },
-                    message = "Profile matches retrieved successfully"
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
-        */
     }
 
     public class CreateProfileRequest
     {
         public int UserId { get; set; }
         public string? Bio { get; set; }
-        public string? Voice { get; set; }
-        public string? University { get; set; }
-        public string? InterestedIn { get; set; }
-        public string? LookingFor { get; set; }
-        public string? StudyStyle { get; set; }
-        public string? WeekendHobby { get; set; }
-        public string? CampusLife { get; set; }
-        public string? FuturePlan { get; set; }
-        public string? CommunicationPreference { get; set; }
-        public string? DealBreakers { get; set; }
-        public string? Zodiac { get; set; }
-        public string? LoveLanguage { get; set; }
-        
-        // New Vietnamese localization fields
-        public EmotionType? Emotion { get; set; }
-        public VoiceQualityType? VoiceQuality { get; set; }
-        public AccentType? Accent { get; set; }
+        public string? Job { get; set; }
+        public string? School { get; set; }
+        public int? InterestedInAgeMin { get; set; }
+        public int? InterestedInAgeMax { get; set; }
+        public string? InterestedInGender { get; set; }
+        public double? MaxDistanceKm { get; set; }
+        public bool ShowOnlyVerified { get; set; }
     }
 }

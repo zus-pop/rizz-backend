@@ -9,46 +9,39 @@ namespace NotificationService.Infrastructure.Services;
 public class RabbitMqEventPublisher : IEventPublisher
 {
     private readonly ILogger<RabbitMqEventPublisher> _logger;
-    private readonly IRabbitMqConnectionFactory _connectionFactory;
+    private readonly IConnection _connection;
+    private readonly IModel _channel;
 
-    public RabbitMqEventPublisher(ILogger<RabbitMqEventPublisher> logger, IRabbitMqConnectionFactory connectionFactory)
+    public RabbitMqEventPublisher(ILogger<RabbitMqEventPublisher> logger, IConnection connection)
     {
         _logger = logger;
-        _connectionFactory = connectionFactory;
+        _connection = connection;
+        _channel = _connection.CreateModel();
+
+        // Declare the exchange for notification events
+        _channel.ExchangeDeclare(
+            exchange: "notification.events",
+            type: ExchangeType.Topic,
+            durable: true,
+            autoDelete: false);
     }
 
     public async Task PublishAsync<T>(T @event, CancellationToken cancellationToken = default) where T : class
     {
-        var connection = _connectionFactory.GetConnection();
-        if (connection == null)
-        {
-            _logger.LogWarning("RabbitMQ connection is not available. Event {EventType} will not be published.", typeof(T).Name);
-            return;
-        }
-
         try
         {
-            using var channel = connection.CreateModel();
-            
-            // Declare the exchange for notification events
-            channel.ExchangeDeclare(
-                exchange: "notification.events",
-                type: ExchangeType.Topic,
-                durable: true,
-                autoDelete: false);
-
             var eventName = @event.GetType().Name;
             var routingKey = $"notification.{eventName.ToLower()}";
             
             var body = JsonSerializer.SerializeToUtf8Bytes(@event);
             
-            var properties = channel.CreateBasicProperties();
+            var properties = _channel.CreateBasicProperties();
             properties.Persistent = true;
             properties.MessageId = Guid.NewGuid().ToString();
             properties.Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
             properties.Type = eventName;
 
-            channel.BasicPublish(
+            _channel.BasicPublish(
                 exchange: "notification.events",
                 routingKey: routingKey,
                 basicProperties: properties,
@@ -62,11 +55,8 @@ public class RabbitMqEventPublisher : IEventPublisher
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to publish event {EventType}", typeof(T).Name);
-            // Don't throw - allow the application to continue even if event publishing fails
-            return;
+            throw;
         }
-
-        await Task.CompletedTask;
     }
 
     public async Task PublishAsync<T>(IEnumerable<T> events, CancellationToken cancellationToken = default) where T : class
@@ -75,6 +65,11 @@ public class RabbitMqEventPublisher : IEventPublisher
         {
             await PublishAsync(@event, cancellationToken);
         }
+    }
+
+    public void Dispose()
+    {
+        _channel?.Dispose();
     }
 }
 

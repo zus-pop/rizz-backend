@@ -1,13 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using NotificationService.Application.Interfaces;
 using NotificationService.Infrastructure.Data;
 using NotificationService.Infrastructure.Repositories;
 using NotificationService.Infrastructure.Services;
-using NotificationService.Infrastructure.Messaging;
-// using RabbitMQ.Client;
+using RabbitMQ.Client;
 
 namespace NotificationService.Infrastructure;
 
@@ -29,23 +27,30 @@ public static class DependencyInjection
         services.AddScoped<INotificationDeliveryInfrastructure, NotificationDeliveryService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<ISmsService, SmsService>();
-        
-        // Configure HttpClient for PushNotificationService
-        services.AddHttpClient<IPushNotificationService, PushNotificationService>();
-        
+        services.AddScoped<IPushNotificationService, PushNotificationService>();
         services.AddScoped<NotificationService.Domain.Services.INotificationTemplateService, NotificationService.Domain.Services.NotificationTemplateService>();
 
         // Add Utility Services
         services.AddSingleton<ICurrentUserService, CurrentUserService>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
-        // RabbitMQ Services - Using resilient implementations
-        services.AddScoped<IRabbitMqConnectionFactory, RabbitMqConnectionFactory>();
-        services.AddScoped<IEventPublisher, RabbitMqEventPublisher>();
-        services.AddScoped<IEventConsumer, RabbitMqEventConsumer>();
+        // Add RabbitMQ
+        services.AddSingleton<IConnection>(provider =>
+        {
+            var factory = new ConnectionFactory
+            {
+                HostName = configuration["RabbitMQ:HostName"] ?? "localhost",
+                Port = int.Parse(configuration["RabbitMQ:Port"] ?? "5672"),
+                UserName = configuration["RabbitMQ:UserName"] ?? "guest",
+                Password = configuration["RabbitMQ:Password"] ?? "guest",
+                VirtualHost = configuration["RabbitMQ:VirtualHost"] ?? "/",
+                DispatchConsumersAsync = true
+            };
 
-        // Background Services - Re-enabled with resilient connection handling
-        services.AddHostedService<EventConsumerBackgroundService>();
+            return factory.CreateConnection();
+        });
+
+        services.AddScoped<IEventPublisher, RabbitMqEventPublisher>();
 
         return services;
     }

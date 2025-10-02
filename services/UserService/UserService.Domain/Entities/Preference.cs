@@ -1,31 +1,19 @@
-using System.Text.Json;
-using UserService.Domain.Enums;
-
 namespace UserService.Domain.Entities
 {
     public class Preference : BaseEntity
     {
         public int UserId { get; private set; }
-        public GenderType? LookingForGender { get; private set; }
-        public int? AgeRangeMin { get; private set; }
-        public int? AgeRangeMax { get; private set; }
-        public int? LocationRadiusKm { get; private set; }
-        public string? InterestsFilter { get; private set; } // JSON string for interests
-        public EmotionType? Emotion { get; private set; }
-        public VoiceQualityType? VoiceQuality { get; private set; }
-        public AccentType? Accent { get; private set; }
+        public int? AgeMin { get; private set; }
+        public int? AgeMax { get; private set; }
+        public string? InterestedInGender { get; private set; }
+        public double? MaxDistanceKm { get; private set; }
+        public bool ShowOnlyVerified { get; private set; }
 
         private Preference() { } // For EF Core
 
         public Preference(int userId)
         {
             UserId = userId;
-        }
-
-        public void SetLookingForGender(GenderType? gender)
-        {
-            LookingForGender = gender;
-            SetUpdatedAt();
         }
 
         public void SetAgeRange(int? minAge, int? maxAge)
@@ -39,48 +27,41 @@ namespace UserService.Domain.Entities
             if (minAge.HasValue && maxAge.HasValue && minAge > maxAge)
                 throw new ArgumentException("Minimum age cannot be greater than maximum age");
 
-            AgeRangeMin = minAge;
-            AgeRangeMax = maxAge;
+            AgeMin = minAge;
+            AgeMax = maxAge;
             SetUpdatedAt();
         }
 
-        public void SetLocationRadius(int? radiusKm)
+        public void SetInterestedInGender(string? gender)
         {
-            if (radiusKm.HasValue && (radiusKm <= 0 || radiusKm > 1000))
-                throw new ArgumentException("Location radius must be between 0 and 1000 km", nameof(radiusKm));
-
-            LocationRadiusKm = radiusKm;
-            SetUpdatedAt();
-        }
-
-        public void SetInterestsFilter(object? interests)
-        {
-            if (interests != null)
+            if (!string.IsNullOrEmpty(gender))
             {
-                InterestsFilter = JsonSerializer.Serialize(interests);
+                var validGenders = new[] { "male", "female", "both" };
+                if (!validGenders.Contains(gender.ToLower()))
+                    throw new ArgumentException("Invalid gender preference", nameof(gender));
+                
+                InterestedInGender = gender.ToLower();
             }
             else
             {
-                InterestsFilter = null;
+                InterestedInGender = null;
             }
+            
             SetUpdatedAt();
         }
 
-        public void SetEmotion(EmotionType? emotion)
+        public void SetMaxDistance(double? maxDistanceKm)
         {
-            Emotion = emotion;
+            if (maxDistanceKm.HasValue && (maxDistanceKm <= 0 || maxDistanceKm > 1000))
+                throw new ArgumentException("Max distance must be between 0 and 1000 km", nameof(maxDistanceKm));
+
+            MaxDistanceKm = maxDistanceKm;
             SetUpdatedAt();
         }
 
-        public void SetVoiceQuality(VoiceQualityType? voiceQuality)
+        public void SetShowOnlyVerified(bool showOnlyVerified)
         {
-            VoiceQuality = voiceQuality;
-            SetUpdatedAt();
-        }
-
-        public void SetAccent(AccentType? accent)
-        {
-            Accent = accent;
+            ShowOnlyVerified = showOnlyVerified;
             SetUpdatedAt();
         }
     }

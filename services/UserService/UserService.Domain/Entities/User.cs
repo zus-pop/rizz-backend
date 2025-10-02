@@ -29,7 +29,7 @@ namespace UserService.Domain.Entities
             get
             {
                 if (Birthday == null) return null;
-                var today = DateTime.UtcNow.Date;
+                var today = DateTime.Today;
                 var age = today.Year - Birthday.Value.Year;
                 if (Birthday.Value.Date > today.AddYears(-age)) age--;
                 return age;
@@ -103,14 +103,13 @@ namespace UserService.Domain.Entities
 
         public void SetBirthday(DateTime birthday)
         {
-            var today = DateTime.UtcNow.Date;
-            if (birthday.Date > today)
+            if (birthday > DateTime.Today)
                 throw new ArgumentException("Birthday cannot be in the future", nameof(birthday));
             
-            if (birthday.Date < today.AddYears(-120))
+            if (birthday < DateTime.Today.AddYears(-120))
                 throw new ArgumentException("Birthday cannot be more than 120 years ago", nameof(birthday));
 
-            Birthday = DateTime.SpecifyKind(birthday.Date, DateTimeKind.Utc);
+            Birthday = birthday.Date;
             SetUpdatedAt();
         }
 

@@ -26,9 +26,7 @@ public class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, i
             Email = request.Email,
             PhoneNumber = request.PhoneNumber ?? string.Empty,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            IsVerified = false,
-            IsEmailVerified = false,
-            IsPhoneVerified = false
+            IsVerified = false
         };
         await _userRepo.AddAsync(user);
         await _userRepo.SaveChangesAsync();

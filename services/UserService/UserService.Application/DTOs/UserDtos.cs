@@ -18,7 +18,6 @@ namespace UserService.Application.DTOs
         public DateTime? VerifiedAt { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public List<PhotoDto> Photos { get; set; } = new();
     }
 
     public class LocationDto
