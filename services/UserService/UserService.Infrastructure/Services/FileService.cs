@@ -103,7 +103,6 @@ namespace UserService.Infrastructure.Services
                 }
             }
 
-            await Task.CompletedTask;
         }
 
         public Task<bool> VoiceFileExistsAsync(int userId)
